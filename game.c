@@ -65,10 +65,10 @@ void placePills(){
 	 int y;
 	 int x;
 		
-   autodistance();
+   //autodistance();
 	 int sum = countFreeCells();
 	 float prob =  246.0 / (float) sum;
-	 int standardPills = 240;
+	 int standardPills = STD_PILLS;
 	 int powerPills = PWR_PILLS;
 	
 	 while (standardPills > 0){
@@ -83,9 +83,9 @@ void placePills(){
 						if (probCell < prob / 2){
 							//maze[y][x] = 2; //put a new std pill here
 							maze[y][x] = 2;       // Top-left
-              maze[y][x + 1] = 2;   // Top-right
-              maze[y + 1][x] = 2;   // Bottom-left
-              maze[y + 1][x + 1] = 2; // Bottom-right
+              maze[y][x + 1] = 10;   // Top-right
+              maze[y + 1][x] = 10;   // Bottom-left
+              maze[y + 1][x + 1] = 10; // Bottom-right
 							standardPills --;
 						}
 						
@@ -113,7 +113,7 @@ void placePills(){
 
 void drawPills(){
 	int y, x;
-	for (y = 0; y < YMAX; y++){
+	for (y = MAZESTART; y < YMAX - MAZESTART; y++){
 		for (x = 0; x < XMAX; x++){
 			if (maze[y][x] == 2){
 				//ho celle 4x4
@@ -133,8 +133,8 @@ void drawPills(){
 
         // Disegna il rombo
         LCD_DrawLine(x_top, y_top, x_right, y_right, STDPILL_COLOR); // Lato superiore-destro
-        LCD_DrawLine(x_right, y_right, x_bottom, y_bottom, STDPILL_COLOR); // Lato destro-inferiore
-        LCD_DrawLine(x_bottom, y_bottom, x_left, y_left, STDPILL_COLOR); // Lato inferiore-sinistro
+        //LCD_DrawLine(x_right, y_right, x_bottom, y_bottom, STDPILL_COLOR); // Lato destro-inferiore
+        //LCD_DrawLine(x_bottom, y_bottom, x_left, y_left, STDPILL_COLOR); // Lato inferiore-sinistro
         LCD_DrawLine(x_left, y_left, x_top, y_top, STDPILL_COLOR); // Lato sinistro-superiore
 			}
 		}
@@ -190,6 +190,27 @@ void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 			
 			//save 1 in the maze matrix
 			maze[y][x] = 1;
+		}
+	}
+}
+
+void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
+	uint8_t x, y;
+	for (y = yS; y < yS + height; y++) {
+		for (x = xS; x < xS + width; x++){
+			uint16_t x0 = x * CELL_W;
+      uint16_t y0 = y * CELL_H;
+      uint16_t x1 = x0 + CELL_W - 1;
+      uint16_t y1 = y0 + CELL_H - 1;
+			
+			LCD_DrawLine(x0, y0, x1, y0, HOUSEDOOR_COLOR); // Linea superiore
+      LCD_DrawLine(x0, y0, x0, y1, HOUSEDOOR_COLOR); // Linea sinistra
+      LCD_DrawLine(x1, y0, x1, y1, HOUSEDOOR_COLOR); // Linea destra
+      LCD_DrawLine(x0, y1, x1, y1, HOUSEDOOR_COLOR); // Linea inferiore
+			
+			
+			//save 7 in the maze matrix
+			maze[y][x] = 7;
 		}
 	}
 }

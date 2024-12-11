@@ -55,41 +55,73 @@ int main(void)
 	//init_timer(0, 0x6108 ); 						  /* 1ms * 25MHz = 25*10^3 = 0x6108 */
 	//init_timer(0, 0x4E2 ); 						    /* 500us * 25MHz = 1.25*10^3 = 0x4E2 */
 	//init_timer(0, 0xC8 ); 						    /* 8us * 25MHz = 200 ~= 0xC8 */
-	
-	//enable_timer(0);
-	//drawPerimeterWalls();
-	//LCD_DrawLine(100, 100, 150, 150, Red);
-	
-	
-	//draw perimeter walls
-	drawWalls(0, 0, YMAX, 4);	//upper perimeter
-	drawWalls(0, XMAX - 4, YMAX, 4); //lower perimeter
-	drawWalls(0, 0, 4, XMAX); //left perimeter
-	drawWalls(YMAX - 4, 0, 4, XMAX);
-	
-	// Muri interni
-  drawWalls(YMAX / 2, 4, 2, 20);      // Corridoio superiore
-	
-	drawWalls(10, 10, 12, 10);	
-	drawWalls(10, 27, 12, 4);
-	drawWalls(YMAX / 2 + 10, 27, 12, 4);
-  drawWalls(10, XMAX / 2 + 10, 12, 4);
-	drawWalls(YMAX - 20, 4, 12, 4);
-	drawWalls(YMAX - 20, XMAX - 20, 25, 8);
-	
-	//CASETTA IN MEZZO
-	drawWalls(YMAX /2 + 5, 30, 2, 8);
-	drawWalls(YMAX /2 - 5, 30, 2, 8);
-	drawWalls(YMAX /2 - 5, 38, 12, 2);
-	
-	
-	drawWalls(YMAX /2, 38, 12, 2);
-	drawWalls(YMAX /2, 38, 2, 10);
 
 	
 	
+	//draw perimeter walls
 	
-	//random walls in the center of the screen
+	drawWalls(0, MAZESTART, XMAX, 2);														//upper perimeter
+	drawWalls(0, YMAX - MAZESTART - 2, XMAX, 2);								//lower perimeter
+	drawWalls(0, MAZESTART, 2, YMAX - 2*MAZESTART);							//left perimeter
+	drawWalls(XMAX - 2, MAZESTART, 2, YMAX - 2*MAZESTART); 			//right perimeter
+	
+	//CASETTA IN MEZZO
+	drawWalls(XMAX / 2 - 4, YMAX / 2, 8, 2); //base  sotto
+	drawWalls(XMAX / 2 - 6, YMAX / 2 - 4, 2, 6); //lato sx
+	drawWalls(XMAX / 2 + 4, YMAX / 2 - 4, 2, 6); //lato dx
+	drawWalls(XMAX / 2 - 6, YMAX / 2 - 4, 4, 2); //anta pre-porta sx
+	drawWalls(XMAX / 2 + 2, YMAX / 2 - 4, 2, 2);		//anta pre-porta dx
+	drawDoor(XMAX / 2 - 2, YMAX / 2 - 4, 4, 1);			//porta
+	
+	//drawWalls();
+	//drawWalls(38, YMAX /2 - 5, 12, 2);
+	
+	
+
+	// Muri interni
+	
+	/* inizio muri interni */
+	//sottoquadrante alto
+  drawWalls(XMAX / 2 - 1, MAZESTART + 2, 2, 8);
+	drawWalls(XMAX / 2 - 1 - 4, MAZESTART + 12, 10, 2);
+	drawWalls(XMAX / 2 - 1 - 4 + 4, MAZESTART + 14, 2, 6);
+	
+	drawWalls(XMAX /4 - 6 , MAZESTART + 4, 4, 6);
+	drawWalls(XMAX /4 , MAZESTART + 4, 6, 6);
+	
+	drawWalls(XMAX - (XMAX /4) - 6, MAZESTART + 4, 4, 6);
+	drawWalls(XMAX - (XMAX /4), MAZESTART + 4, 6, 6);
+	
+	drawWalls(XMAX - (XMAX /4) - 5, MAZESTART + 12, 10, 2);
+	drawWalls(XMAX /4 - 6, MAZESTART + 12, 10, 2);
+	
+	drawWalls(XMAX - (XMAX / 2) + 1, MAZESTART + 2, 2, 8);
+	drawWalls(XMAX - (XMAX / 2) + 1 - 4, MAZESTART + 12, 10, 2);
+	drawWalls(XMAX - (XMAX / 2) + 1 - 4 + 4, MAZESTART + 14, 2, 6);
+	
+	//sottoquadrante basso
+	drawWalls(XMAX /4 - 6 , YMAX - 2*MAZESTART - 5, 4, 6);
+	drawWalls(XMAX /4 , YMAX - 2*MAZESTART - 5, 6, 6);
+	
+	drawWalls(XMAX - (XMAX /4) - 6, YMAX - 2*MAZESTART - 5, 4, 6);
+	drawWalls(XMAX - (XMAX /4), YMAX - 2*MAZESTART - 5, 6, 6);
+	
+	drawWalls(XMAX - (XMAX /4) - 5, YMAX - 2*MAZESTART - 13, 10, 2);
+	drawWalls(XMAX /4 - 6, YMAX - 2*MAZESTART - 13, 10, 2);
+	
+	
+	drawWalls(XMAX / 2 - 1, YMAX - 2*MAZESTART - 3, 4, 8);
+	drawWalls(XMAX / 2 - 1 - 4, YMAX - 2*MAZESTART - 13, 10, 2);
+	//drawWalls(XMAX / 2 - 1 - 4 + 4, MAZESTART + 14, 2, 6);
+	
+	drawWalls(XMAX /4 - 2, (YMAX - 2*MAZESTART) / 2 - 6, 2, 8);
+	drawWalls(XMAX /4 - 2, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
+	
+	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 - 6, 2, 8);
+	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
+	
+	
+	/* fine muri interni */
 	
 	
 	//PILLS MANAGEMENT DA FARE ALLA FINE
@@ -98,9 +130,9 @@ int main(void)
 	
 	
 	//left tunnel
-	drawTunnel(0, XMAX / 2 - 4, 4, 8);
+	drawTunnel(0, (YMAX - 2*MAZESTART) / 2, 2, 8);
 	//right tunnel
-	drawTunnel(YMAX - 4, XMAX / 2 - 4, 4, 8);
+	drawTunnel(XMAX - 2, (YMAX - 2*MAZESTART) / 2, 2, 8);
 	
 	
 	
