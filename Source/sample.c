@@ -35,10 +35,14 @@ extern uint8_t ScaleFlag; // <- ScaleFlag needs to visible in order for the emul
 
 
 /* General variables for the game */
+uint8_t playerDir;
+
 
 int main(void)
 {
   SystemInit();  												/* System Initialization (i.e., PLL)  */
+	
+	
 	
   LCD_Initialization();
 	
@@ -48,15 +52,6 @@ int main(void)
 	//TouchPanel_Calibrate();
 	
 	LCD_Clear(BACKGROUND_COLOR);
-	//GUI_Text(0, 280, (uint8_t *) " touch here : 1 sec to clear  ", Red, White);
-	
-	
-	//LCD_DrawLine(0, 0, 200, 200, White);
-	//init_timer(0, 0x1312D0 ); 						/* 50ms * 25MHz = 1.25*10^6 = 0x1312D0 */
-	//init_timer(0, 0x6108 ); 						  /* 1ms * 25MHz = 25*10^3 = 0x6108 */
-	//init_timer(0, 0x4E2 ); 						    /* 500us * 25MHz = 1.25*10^3 = 0x4E2 */
-	//init_timer(0, 0xC8 ); 						    /* 8us * 25MHz = 200 ~= 0xC8 */
-
 	
 	
 	//draw perimeter walls
@@ -76,10 +71,9 @@ int main(void)
 	
 	//drawWalls();
 	//drawWalls(38, YMAX /2 - 5, 12, 2);
+
 	
-	
-	
-	/* NUOVA MAPPA */
+	//NUOVA MAPPA
 	drawWalls(24, MAZESTART + 2, 2, 5);
 	drawWalls(13, MAZESTART + 5, 7, 2);
 	drawWalls(6, MAZESTART + 5, 3, 2);
@@ -102,9 +96,11 @@ int main(void)
 	drawWalls(XMAX - 2 - 4, YMAX - MAZESTART - 20, 4, 2);
 	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 - 4, 2, 8);
 	drawWalls(XMAX /4, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
+	
+	/*
 	// Muri interni
 	
-	/* inizio muri interni 
+
 	//sottoquadrante alto
   drawWalls(XMAX / 2 - 1, MAZESTART + 2, 2, 8);
 	drawWalls(XMAX / 2 - 1 - 4, MAZESTART + 12, 10, 2);
@@ -144,12 +140,14 @@ int main(void)
 	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 - 6, 2, 8);
 	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
 	
-	
-	 fine muri interni */
+	*/
 	
 	
 	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
 	drawPlayer(plX , plY, RIGHT_DIR);
+	
+	//SET DIR AS IDLE (DON'T MOVE UNLESS THE USERS TOUCHES THE JOYSTICK)
+	playerDir = IDLE_DIR;
 	
 	//PILLS MANAGEMENT DA FARE ALLA FINE
 	placePills4();
@@ -164,6 +162,8 @@ int main(void)
 	//drawBlanks();
 	
 	
+	//ENABLE JOYSTICK
+	joystick_init();
 	
 	//START GAME TIMERS
 	
@@ -172,6 +172,10 @@ int main(void)
 	
 	//START TIMER0 TO UPDATE GAME (60 FPS)
 	init_timer(0, FPS_Time);
+	
+	reset_RIT();
+	enable_RIT();
+	enable_timer(0);
 	
 	
 	

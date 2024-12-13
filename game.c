@@ -464,3 +464,27 @@ void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction){
 	}
 
 }
+
+void erasePlayer(uint16_t cellX, uint16_t cellY){
+	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
+	uint16_t x, y;
+	uint16_t cntX = 0, cntY = 0;
+	
+	maze[cellY][cellX] = FREE_CODE;
+	maze[cellY+1][cellX] = FREE_CODE;
+	maze[cellY][cellX+1] = FREE_CODE;
+	maze[cellY+1][cellX+1] = FREE_CODE;
+	
+	for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
+				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
+					LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+					
+					cntY++;
+				}
+				cntY = 0;
+				++cntX;
+	}
+}
+
+	
+	

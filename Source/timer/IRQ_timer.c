@@ -26,37 +26,64 @@
 
 void TIMER0_IRQHandler (void)
 {
-	static int clear = 0;
-	char time_in_char[5] = "";
-	int mosse[6][2]={{1,1},{-1,-1},{1,0},{-1,0},{0,1},{0,-1}};
-	int i=0;
-	
-  if(getDisplayPoint(&display, Read_Ads7846(), &matrix )){
-		if(display.y < 280){
-			for(i=0;i<6;i++)
-				TP_DrawPoint(display.x+mosse[i][0],display.y+mosse[i][1]);
-			TP_DrawPoint(display.x,display.y);
-			GUI_Text(200, 0, (uint8_t *) "     ", Blue, Blue);
-			clear = 0;
-		}
-		else{			
-			if(display.y <= 0x13E){			
-				clear++;
-				if(clear%20 == 0){
-					sprintf(time_in_char,"%4d",clear/20);
-					GUI_Text(200, 0, (uint8_t *) time_in_char, White, Blue);
-					if(clear == 200){	/* 1 seconds = 200 times * 500 us*/
-						LCD_Clear(Black);
-						GUI_Text(0, 280, (uint8_t *) " touch here : 1 sec to clear ", Blue, White);			
-						clear = 0;
-					}
-				}
-			}
-		}
-	}
-	else{
-		//do nothing if touch returns values out of bounds
-	}
+	switch (playerDir) {
+    case RIGHT_DIR: {
+        int nextX = plX + 1; // Spostamento a destra
+        if (maze[plY][nextX] == FREE_CODE) {
+            // Il giocatore può muoversi
+            erasePlayer(plX, plY);
+            plX = nextX;
+            drawPlayer(plX, plY, playerDir);
+        } else if (maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) {
+            // Mangia la STDPILL
+            // TODO: gestione punteggio o stato
+            erasePlayer(plX, plY);
+            plX = nextX;
+            drawPlayer(plX, plY, playerDir);
+        }
+        break;
+    }
+    case LEFT_DIR: {
+        int nextX = plX - 1; // Spostamento a sinistra
+        if (maze[plY][nextX] == FREE_CODE) {
+            erasePlayer(plX, plY);
+            plX = nextX;
+            drawPlayer(plX, plY, playerDir);
+        } else if (maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) {
+            erasePlayer(plX, plY);
+            plX = nextX;
+            drawPlayer(plX, plY, playerDir);
+        }
+        break;
+    }
+    case UP_DIR: {
+        int nextY = plY - 1; // Spostamento in alto
+        if (maze[nextY][plX] == FREE_CODE) {
+            erasePlayer(plX, plY);
+            plY = nextY;
+            drawPlayer(plX, plY, playerDir);
+        } else if (maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) {
+            erasePlayer(plX, plY);
+            plY = nextY;
+            drawPlayer(plX, plY, playerDir);
+        }
+        break;
+    }
+    case DOWN_DIR: {
+        int nextY = plY + 1; // Spostamento in basso
+        if (maze[nextY][plX] == FREE_CODE) {
+            erasePlayer(plX, plY);
+            plY = nextY;
+            drawPlayer(plX, plY, playerDir);
+        } else if (maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) {
+            erasePlayer(plX, plY);
+            plY = nextY;
+            drawPlayer(plX, plY, playerDir);
+        }
+        break;
+    }
+}
+
   LPC_TIM0->IR = 1;			/* clear interrupt flag */
   return;
 }

@@ -59,13 +59,15 @@
 1 -> left
 2 -> up
 3 -> down
+4 -> idle 
 default direction (at te beginning of the game) is right
 */
 #define RIGHT_DIR 0
 #define LEFT_DIR 1
 #define UP_DIR 2
 #define DOWN_DIR 3
-static uint8_t playerDir = RIGHT_DIR;
+#define IDLE_DIR 4
+extern uint8_t playerDir;
 
 
 //PLAYER POSITION
@@ -80,7 +82,7 @@ static uint16_t plY = YMAX / 2 + 2;
 //Counter for Timer0: K = Freq * T
 //I want 60 FPS -> T = 1 / (60) = 16 ms ca
 //K = 16 * 10^-3 * 25 * 10^6 = 400000 -> 0x61A80
-#define FPS_Time 0x00061A80
+#define FPS_Time 0x4C4B40 //0x00061A80
 
 
 //GAME MECHANICS INTERRUPTS PRIORITIES
@@ -90,8 +92,8 @@ RIT -> priority 1
 TIMER0 -> priority 2
 TIMER1 (60 sec counter) -> priority 3
 */
-#define RIT_Priority 1
-#define TIM0_Priority 2
+#define RIT_Priority 0
+#define TIM0_Priority 5
 
 
 /*
@@ -135,5 +137,9 @@ void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawTunnel(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawBlanks();
+uint16_t getPixelX(uint16_t cellX); 
+uint16_t getPixelY(uint16_t cellY); 
 void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction);
+void drawPlayerByPixels(uint16_t pixelX, uint16_t pixelY, uint8_t direction);
+void erasePlayer(uint16_t cellX, uint16_t cellY);
 #endif

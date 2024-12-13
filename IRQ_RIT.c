@@ -1,6 +1,5 @@
+#include "LPC17xx.h"
 #include "RIT.h"
-
-extern uint8_t playerDir; 
 
 void RIT_IRQHandler(void) {
 	
@@ -13,18 +12,20 @@ void RIT_IRQHandler(void) {
 	//JOYSTICK DOWN PRESSED -> SET DIR TO DOWN -> 3
 	if((LPC_GPIO1->FIOPIN & (1<<26)) == 0){	
 		playerDir = DOWN_DIR;
+		//LCD_Clear(Blue);
 	}
 	
 	if ((LPC_GPIO1->FIOPIN & (1<<27)) == 0){	
 		playerDir = LEFT_DIR;
 	}
 	
-	 if ((LPC_GPIO1->FIOPIN & (1<<28)) == 0){	
-		 playerDir = RIGHT_DIR;
-	 }
+	if ((LPC_GPIO1->FIOPIN & (1<<28)) == 0){	
+		playerDir = RIGHT_DIR;
+	}
+	
 	 
 	 
-	 LPC_RIT->RICTRL |= 0x1;	/* clear interrupt flag */
+	LPC_RIT->RICTRL |= 0x1;	/* clear interrupt flag */
 	 
 	 return;
 }

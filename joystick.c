@@ -1,5 +1,5 @@
+#include "LPC17xx.h"
 #include "RIT.h"
-
 
 void joystick_init(void) {
 
@@ -19,4 +19,5 @@ void joystick_init(void) {
     LPC_PINCON->PINSEL3 &= ~(3<<26); // SET pin 26, 27 to 00 in PINSEL3
     LPC_GPIO1->FIODIR   &= ~(1<<29); // P1.29 Input (joystick on PORT1 defined as Input)
 
+		return;
 }
