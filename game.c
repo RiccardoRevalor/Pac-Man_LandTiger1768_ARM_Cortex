@@ -111,6 +111,59 @@ void placePills(){
     }
 }
 
+void placePills4(){
+	/*
+	Random average placement:
+	count the number of free cells (having value = 0)
+	the probability is 246 (number of std pills + pwr pills) / free_cells
+	use rand for every cell, if the returened value of rand() is > of the probability, place the pill in that cell, otherwise skip it
+	*/
+
+	 int y;
+	 int x;
+	 int standardPills = STD_PILLS;
+	 int powerPills = PWR_PILLS;
+	
+	 while (standardPills > 0){
+		 for (y = MAZESTART; y <= YMAX - MAZESTART - 1 && standardPills > 0; y++) {
+					for (x = 1; x <= XMAX - 1 && standardPills > 0; x++) {
+						
+						//if (maze[y][x] != 0) continue; //|| maze[y + 2][x + 1] != 0
+						if (maze[y][x] != 0 || maze[y][x + 1] != 0 || maze[y][x-1] != 0 || maze[y][x+2] != 0 || maze[y + 1][x] != 0 || maze[y + 1][x + 1] != 0 || maze[y + 1][x + 2] != 0) continue;
+						//if (!isAreaFree(y,x,1)) continue;
+						float probCell = (float)rand()/(float)(RAND_MAX);
+						
+						//if (1 == 1){
+							//maze[y][x] = 2; //put a new std pill here
+							maze[y][x] = 2;       // Top-left
+              maze[y][x + 1] = 10;   // Top-right
+              maze[y + 1][x] = 10;   // Bottom-left
+              maze[y + 1][x + 1] = 10; // Bottom-right
+							standardPills --;
+						//}
+						
+						
+						/* before: fill everything algorithm
+							if (maze[y][x] == 0 && standardPills > 0) {
+									maze[y][x] = 2; // Pillola standard
+									standardPills--;
+							}
+						*/
+					}
+			}
+		}
+
+    while (powerPills > 0) {
+        int x = rand() % XMAX;
+        int y = rand() % YMAX;
+
+        if (maze[y][x] == 0) { // Sostituisci pillola standard con power pill
+            maze[y][x] = 3;
+            powerPills--;
+        }
+    }
+}
+
 void drawPills(){
 	int y, x;
 	for (y = MAZESTART; y < YMAX - MAZESTART; y++){
@@ -136,6 +189,53 @@ void drawPills(){
         //LCD_DrawLine(x_right, y_right, x_bottom, y_bottom, STDPILL_COLOR); // Lato destro-inferiore
         //LCD_DrawLine(x_bottom, y_bottom, x_left, y_left, STDPILL_COLOR); // Lato inferiore-sinistro
         LCD_DrawLine(x_left, y_left, x_top, y_top, STDPILL_COLOR); // Lato sinistro-superiore
+			}
+		}
+	}
+}
+
+void drawPills4(){
+	int y, x;
+	for (y = MAZESTART; y < YMAX - MAZESTART; y++){
+		for (x = 0; x < XMAX; x++){
+			if (maze[y][x] == 2){
+				//pills su quadrato di celle 2x2
+				//cioè 16x16 pixel
+				
+				
+			/*
+				//estremo in alto
+			uint16_t x0 = x * CELL_W;
+      uint16_t y0 = y * CELL_H;
+      uint16_t x1 = x0 + 2 * CELL_W - 1;
+      uint16_t y1 = y0 + 2 * CELL_H - 1;
+			
+			LCD_DrawLine(x0, y0, x1, y0, STDPILL_COLOR); // Linea superiore
+      LCD_DrawLine(x0, y0, x0, y1, STDPILL_COLOR); // Linea sinistra
+      LCD_DrawLine(x1, y0, x1, y1, STDPILL_COLOR); // Linea destra
+      LCD_DrawLine(x0, y1, x1, y1, STDPILL_COLOR); // Linea inferiore
+			*/
+				
+			 // Coordinate del centro del blocco 2x2
+                uint16_t cx = (x * CELL_W + (x + 1) * CELL_W) / 2; // Media tra le celle orizzontali
+                uint16_t cy = (y * CELL_H + (y + 1) * CELL_H) / 2; // Media tra le celle verticali
+
+                // Coordinate dei vertici del rombo
+                uint16_t x_top = cx;
+                uint16_t y_top = cy - CELL_H / 2; // Sopra di metà altezza del blocco
+                uint16_t x_right = cx + CELL_W / 2; // A destra di metà larghezza del blocco
+                uint16_t y_right = cy;
+                uint16_t x_bottom = cx;
+                uint16_t y_bottom = cy + CELL_H / 2; // Sotto di metà altezza del blocco
+                uint16_t x_left = cx - CELL_W / 2; // A sinistra di metà larghezza del blocco
+                uint16_t y_left = cy;
+
+                // Disegna il rombo
+                LCD_DrawLine(x_top, y_top, x_right, y_right, STDPILL_COLOR);  // Lato superiore-destro
+                LCD_DrawLine(x_right, y_right, x_bottom, y_bottom, STDPILL_COLOR); // Lato destro-inferiore
+                LCD_DrawLine(x_bottom, y_bottom, x_left, y_left, STDPILL_COLOR); // Lato inferiore-sinistro
+                LCD_DrawLine(x_left, y_left, x_top, y_top, STDPILL_COLOR);  // Lato sinistro-superiore
+              
 			}
 		}
 	}
@@ -194,6 +294,26 @@ void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 	}
 }
 
+void drawBlanks(){
+	uint8_t x, y;
+	for (y = MAZESTART; y < YMAX - MAZESTART; y++) {
+		for (x = 0; x < YMAX; x++){
+			if (maze[y][x] != 0) continue;
+			uint16_t x0 = x * CELL_W;
+      uint16_t y0 = y * CELL_H;
+      uint16_t x1 = x0 + CELL_W - 1;
+      uint16_t y1 = y0 + CELL_H - 1;
+			
+			LCD_DrawLine(x0, y0, x1, y0, White); // Linea superiore
+      LCD_DrawLine(x0, y0, x0, y1, White); // Linea sinistra
+      LCD_DrawLine(x1, y0, x1, y1, White); // Linea destra
+      LCD_DrawLine(x0, y1, x1, y1, White); // Linea inferiore
+			
+		}
+	}
+}
+
+
 void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 	uint8_t x, y;
 	for (y = yS; y < yS + height; y++) {
@@ -236,4 +356,32 @@ void drawTunnel(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 		}
 	}
 	
+}
+
+uint16_t getPixelX(uint16_t cellX) { return cellX / XMAX;};
+uint16_t getPixelY(uint16_t cellY) { return (cellY + MAZESTART) / YMAX;};
+
+void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction){
+	/*
+	direction: 
+	0 -> right
+	*/
+	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
+	uint16_t x, y;
+	uint16_t cntX = 0, cntY = 0;
+	switch (direction){
+	
+		case 0: {
+			for (x = xplayer; x < xplayer + 16; x++) {
+				for (y = yplayer; y < yplayer + 16; y++) {
+					if (player[cntY][cntX] == 1) {
+						LCD_SetPoint(x, y, PLAYER_COLOR);
+					}
+					cntY++;
+				}
+				cntY = 0;
+				++cntX;
+			}
+		}
+	}
 }

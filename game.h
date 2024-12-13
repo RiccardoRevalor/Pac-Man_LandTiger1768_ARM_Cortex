@@ -7,8 +7,9 @@
 //colors scheme
 #define WALL_COLOR Blue
 #define BACKGROUND_COLOR Black
-#define STDPILL_COLOR Yellow
+#define STDPILL_COLOR Red
 #define HOUSEDOOR_COLOR Magenta
+#define PLAYER_COLOR Yellow
 
 //position of maze start
 #define MAZESTART 5
@@ -55,13 +56,35 @@ space for score, timer etc: (MAZESTART * XMAX) * 2 = 480
 
 
 static unsigned int maze[YMAX][XMAX] = {0};
-		
+
+//PACMAN -> quadrato 2x2 celle. Disegno pixel per pixel
+static uint8_t player[16][16] = {
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, // Riga 1
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, // Riga 2
+    {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, // Riga 3
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 4
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 5
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, // Riga 6
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, // Riga 7
+    {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, // Riga 8
+    {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, // Riga 9
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, // Riga 10
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 11
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 12
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 13
+    {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, // Riga 14
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, // Riga 15
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}  // Riga 16
+};
 
 
 //GFX
-void placePills();
+void placePills4();
+void drawPills4();
 void drawPills();
 void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawTunnel(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
+void drawBlanks();
+void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction);
 #endif

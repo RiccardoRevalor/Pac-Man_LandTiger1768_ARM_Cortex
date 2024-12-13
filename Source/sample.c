@@ -77,10 +77,33 @@ int main(void)
 	//drawWalls(38, YMAX /2 - 5, 12, 2);
 	
 	
-
+	
+	/* NUOVA MAPPA */
+	drawWalls(24, MAZESTART + 2, 2, 5);
+	drawWalls(13, MAZESTART + 5, 7, 2);
+	drawWalls(6, MAZESTART + 5, 3, 2);
+	drawWalls(6, MAZESTART + 11, 3, 8);
+  drawWalls(13, MAZESTART + 11, 2, 6);
+	drawWalls(13, MAZESTART + 17, 6, 2);
+	drawWalls(19, MAZESTART + 11, 11, 2);
+	drawWalls(23, MAZESTART + 13, 3, 6);
+	drawWalls(30, MAZESTART + 5, 7, 2);
+	drawWalls(41, MAZESTART + 5, 1, 2);
+	drawWalls(34, MAZESTART + 11, 8, 3);
+	drawWalls(34, MAZESTART + 18, 8, 3);
+	drawWalls(13, YMAX - MAZESTART - 8, 7, 2);
+	drawWalls(6, YMAX - MAZESTART - 8, 3, 2);
+	drawWalls(24, YMAX - MAZESTART - 8, 3, 2);
+	drawWalls(36, YMAX - MAZESTART - 8, 6, 2);
+	drawWalls(6, YMAX - MAZESTART - 14, 14, 2);
+	drawWalls(24, YMAX - MAZESTART - 14, 10, 2);
+	drawWalls(6, YMAX - MAZESTART - 20, 2, 6);
+	drawWalls(XMAX - 2 - 4, YMAX - MAZESTART - 20, 4, 2);
+	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 - 4, 2, 8);
+	drawWalls(XMAX /4, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
 	// Muri interni
 	
-	/* inizio muri interni */
+	/* inizio muri interni 
 	//sottoquadrante alto
   drawWalls(XMAX / 2 - 1, MAZESTART + 2, 2, 8);
 	drawWalls(XMAX / 2 - 1 - 4, MAZESTART + 12, 10, 2);
@@ -121,12 +144,12 @@ int main(void)
 	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
 	
 	
-	/* fine muri interni */
+	 fine muri interni */
 	
 	
 	//PILLS MANAGEMENT DA FARE ALLA FINE
-	placePills();
-	drawPills();
+	placePills4();
+	drawPills4();
 	
 	
 	//left tunnel
@@ -134,7 +157,8 @@ int main(void)
 	//right tunnel
 	drawTunnel(XMAX - 2, (YMAX - 2*MAZESTART) / 2, 2, 8);
 	
-	
+	//drawBlanks();
+	drawPlayer(30, 30, 0);
 	
 	
 	LPC_SC->PCON |= 0x1;									/* power-down	mode										*/
