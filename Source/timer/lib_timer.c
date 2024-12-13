@@ -143,6 +143,7 @@ uint32_t init_timer ( uint8_t timer_num, uint32_t TimerInterval )
 // <<< end of configuration section >>>    
 
 	NVIC_EnableIRQ(TIMER0_IRQn);
+	NVIC_SetPriority(TIMER0_IRQn, TIM0_Priority);
 	return (1);
   }
   else if ( timer_num == 1 )

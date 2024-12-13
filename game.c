@@ -76,16 +76,16 @@ void placePills(){
 					for (x = 0; x < XMAX - 1 && standardPills > 0; x+=2) {
 						
 						//if (maze[y][x] != 0) continue;
-						if (maze[y][x] != 0 || maze[y][x + 1] != 0 || maze[y + 1][x] != 0 || maze[y + 1][x + 1] != 0) continue;
+						if (maze[y][x] != FREE_CODE || maze[y][x + 1] != FREE_CODE || maze[y + 1][x] != FREE_CODE || maze[y + 1][x + 1] != FREE_CODE) continue;
 						//if (!isAreaFree(y,x,1)) continue;
 						float probCell = (float)rand()/(float)(RAND_MAX);
 						
 						if (probCell < prob / 2){
 							//maze[y][x] = 2; //put a new std pill here
-							maze[y][x] = 2;       // Top-left
-              maze[y][x + 1] = 10;   // Top-right
-              maze[y + 1][x] = 10;   // Bottom-left
-              maze[y + 1][x + 1] = 10; // Bottom-right
+							maze[y][x] = STDPILL_CODE_1;       // Top-left
+              maze[y][x + 1] = STDPILL_CODE_2;   // Top-right
+              maze[y + 1][x] = STDPILL_CODE_2;   // Bottom-left
+              maze[y + 1][x + 1] = STDPILL_CODE_2; // Bottom-right
 							standardPills --;
 						}
 						
@@ -129,16 +129,16 @@ void placePills4(){
 					for (x = 1; x <= XMAX - 1 && standardPills > 0; x++) {
 						
 						//if (maze[y][x] != 0) continue; //|| maze[y + 2][x + 1] != 0
-						if (maze[y][x] != 0 || maze[y][x + 1] != 0 || maze[y][x-1] != 0 || maze[y][x+2] != 0 || maze[y + 1][x] != 0 || maze[y + 1][x + 1] != 0 || maze[y + 1][x + 2] != 0) continue;
+						if (maze[y][x] != FREE_CODE || maze[y][x + 1] != FREE_CODE || maze[y][x-1] != FREE_CODE || maze[y][x+2] != FREE_CODE || maze[y + 1][x] != FREE_CODE || maze[y + 1][x + 1] != FREE_CODE || maze[y + 1][x + 2] != FREE_CODE) continue;
 						//if (!isAreaFree(y,x,1)) continue;
 						float probCell = (float)rand()/(float)(RAND_MAX);
 						
 						//if (1 == 1){
 							//maze[y][x] = 2; //put a new std pill here
-							maze[y][x] = 2;       // Top-left
-              maze[y][x + 1] = 10;   // Top-right
-              maze[y + 1][x] = 10;   // Bottom-left
-              maze[y + 1][x + 1] = 10; // Bottom-right
+							maze[y][x] = STDPILL_CODE_1;       // Top-left
+              maze[y][x + 1] = STDPILL_CODE_2;   // Top-right
+              maze[y + 1][x] = STDPILL_CODE_2;   // Bottom-left
+              maze[y + 1][x + 1] = STDPILL_CODE_2; // Bottom-right
 							standardPills --;
 						//}
 						
@@ -168,7 +168,7 @@ void drawPills(){
 	int y, x;
 	for (y = MAZESTART; y < YMAX - MAZESTART; y++){
 		for (x = 0; x < XMAX; x++){
-			if (maze[y][x] == 2){
+			if (maze[y][x] == STDPILL_CODE_1){
 				//ho celle 4x4
 // Coordinate del centro della cella
         uint16_t cx = x * CELL_W + CELL_W / 2;
@@ -198,7 +198,7 @@ void drawPills4(){
 	int y, x;
 	for (y = MAZESTART; y < YMAX - MAZESTART; y++){
 		for (x = 0; x < XMAX; x++){
-			if (maze[y][x] == 2){
+			if (maze[y][x] == STDPILL_CODE_1){
 				//pills su quadrato di celle 2x2
 				//cioè 16x16 pixel
 				
@@ -251,7 +251,7 @@ void drawPerimeterWalls(){
 			
 			int cellValue = maze[y][x];
 			
-			if (cellValue == 1){
+			if (cellValue == WALL_CODE){
 				//wall detected
 				//translate fake cell coordinates into the real ones
 				//each cell is 16x15 pixels
@@ -289,7 +289,7 @@ void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 			
 			
 			//save 1 in the maze matrix
-			maze[y][x] = 1;
+			maze[y][x] = WALL_CODE;
 		}
 	}
 }
@@ -330,7 +330,7 @@ void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 			
 			
 			//save 7 in the maze matrix
-			maze[y][x] = 7;
+			maze[y][x] = DOOR_CODE;
 		}
 	}
 }
@@ -352,14 +352,61 @@ void drawTunnel(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 			
 			
 			//save 1 in the maze matrix
-			maze[y][x] = 4;
+			maze[y][x] = TUNNEL_CODE;
 		}
 	}
 	
 }
 
-uint16_t getPixelX(uint16_t cellX) { return cellX / XMAX;};
-uint16_t getPixelY(uint16_t cellY) { return (cellY + MAZESTART) / YMAX;};
+
+void rotatePlayer(uint8_t dest[PLAYER_H][PLAYER_W], uint8_t dir) {
+	/* Function to perform a rotation on the player matrix
+	If dir == 0 (right dir), no rotation needed, so no need to call this function !
+	This works wether dir = 1 or 2 or 3
+	*/
+	
+	uint8_t x, y;
+	
+	if (dir == RIGHT_DIR) return;
+	
+	uint8_t dimY = PLAYER_H;
+	uint8_t dimX = PLAYER_W;
+	
+	if (dir == LEFT_DIR) {
+		//rotate the matrix by 180 degress clockwise
+		for (y = 0; y < dimY; y++) {
+         for (x = 0; x < dimX; x++) {
+              dest[dimY - 1 - y][dimX - 1 - x] = player[y][x];
+         }
+		}
+	}
+	
+	if (dir == DOWN_DIR) {
+		//rotate the matrix by 90 degress clockwise
+		for (y = 0; y < dimY; y++) {
+         for (x = 0; x < dimX; x++) {
+              dest[x][dimY - 1 - y] = player[y][x];
+         }
+		}
+	}
+	
+	if (dir == UP_DIR) {
+		//rotate the matrix by 270 degress clockwise
+		for (y = 0; y < dimY; y++) {
+         for (x = 0; x < dimX; x++) {
+              dest[dimX - 1 - x][y] = player[y][x];
+         }
+		}
+	}
+	
+	
+	
+	
+}
+
+
+uint16_t getPixelX(uint16_t cellX) { return cellX * CELL_W - 1;}; //cellX / XMAX;
+uint16_t getPixelY(uint16_t cellY) { return cellY * CELL_H - 1;}; //(cellY + MAZESTART) / YMAX;
 
 void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction){
 	/*
@@ -369,19 +416,51 @@ void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction){
 	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
 	uint16_t x, y;
 	uint16_t cntX = 0, cntY = 0;
-	switch (direction){
 	
-		case 0: {
-			for (x = xplayer; x < xplayer + 16; x++) {
-				for (y = yplayer; y < yplayer + 16; y++) {
+	
+	/*
+	Operations:
+	1) set the player number in the maze matrix to assign the cells to the player prop
+		 (cellY, cellX) is the left-upper cell of the square of the player
+	2) draw the player shape by iterating on the player's own matrix
+	*/
+	
+	maze[cellY][cellX] = PLAYER_CODE;
+	maze[cellY+1][cellX] = PLAYER_CODE;
+	maze[cellY][cellX+1] = PLAYER_CODE;
+	maze[cellY+1][cellX+1] = PLAYER_CODE;
+	
+	
+	static uint8_t playerRotated[PLAYER_H][PLAYER_W];
+	//if direction != right, player needs to be rotated first
+	if (direction != RIGHT_DIR) rotatePlayer(playerRotated, direction);
+	
+	if (direction == RIGHT_DIR) {
+			for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
+				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
 					if (player[cntY][cntX] == 1) {
-						LCD_SetPoint(x, y, PLAYER_COLOR);
+						LCD_SetPoint(x, y, PLAYER_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
+					} else {
+						LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
 					}
 					cntY++;
 				}
 				cntY = 0;
 				++cntX;
 			}
+	} else {
+		for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
+				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
+					if (playerRotated[cntY][cntX] == 1) {
+						LCD_SetPoint(x, y, PLAYER_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
+					} else {
+						LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+					}
+					cntY++;
+				}
+				cntY = 0;
+				++cntX;
 		}
 	}
+
 }

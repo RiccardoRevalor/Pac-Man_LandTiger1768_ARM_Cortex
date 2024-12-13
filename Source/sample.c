@@ -24,8 +24,9 @@
 #include "LPC17xx.h"
 #include "GLCD/GLCD.h" 
 #include "TouchPanel/TouchPanel.h"
-#include "timer/timer.h"
-#include "../../game.h"
+#include "timer/timer.h" //TIMER 
+#include "../../game.h"  //GAME LIBRARY
+#include "../../RIT.h"   //RIT 
 
 
 #ifdef SIMULATOR
@@ -147,6 +148,9 @@ int main(void)
 	 fine muri interni */
 	
 	
+	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
+	drawPlayer(plX , plY, RIGHT_DIR);
+	
 	//PILLS MANAGEMENT DA FARE ALLA FINE
 	placePills4();
 	drawPills4();
@@ -158,7 +162,17 @@ int main(void)
 	drawTunnel(XMAX - 2, (YMAX - 2*MAZESTART) / 2, 2, 8);
 	
 	//drawBlanks();
-	drawPlayer(30, 30, 0);
+	
+	
+	
+	//START GAME TIMERS
+	
+	//START RIT FOR POLLING THE JOYSTICK
+	init_RIT(RIT_Time);
+	
+	//START TIMER0 TO UPDATE GAME (60 FPS)
+	init_timer(0, FPS_Time);
+	
 	
 	
 	LPC_SC->PCON |= 0x1;									/* power-down	mode										*/

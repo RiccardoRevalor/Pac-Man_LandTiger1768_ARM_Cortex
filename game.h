@@ -27,6 +27,11 @@
 #define CELL_H 5  //4 //16
 #define CELL_W 5  //4 //15
 
+//Player's dimensions in terms of pixels
+//The player occupied a square of 2x2 cells, so it would be 10x10 pixels since each cell is 5x5
+#define PLAYER_CELLS_H 2
+#define PLAYER_CELLS_W 2
+
 //The labyrinth is mapped to a matrix of cells measuring 11x11
 
 #define STD_PILLS 240
@@ -38,8 +43,55 @@
 		3 -> power pill
 		4 -> tele-transport tunnels (traversable by player to reach opposite parts of the map)
 		7 -> house door
+		9 -> player
 */
+#define FREE_CODE 0
+#define WALL_CODE 1
+#define STDPILL_CODE_1 2
+#define STDPILL_CODE_2 10
+#define TUNNEL_CODE 4
+#define DOOR_CODE 7
+#define PLAYER_CODE 9
 
+//PLAYER DIRECTION
+/*
+0 -> right
+1 -> left
+2 -> up
+3 -> down
+default direction (at te beginning of the game) is right
+*/
+#define RIGHT_DIR 0
+#define LEFT_DIR 1
+#define UP_DIR 2
+#define DOWN_DIR 3
+static uint8_t playerDir = RIGHT_DIR;
+
+
+//PLAYER POSITION
+//these are the default position at te beginning of a new game
+static uint16_t plX = XMAX / 2;
+static uint16_t plY = YMAX / 2 + 2;
+
+
+//IN-GAME TIMINGS
+#define RIT_Time 0x004C4B40
+
+//Counter for Timer0: K = Freq * T
+//I want 60 FPS -> T = 1 / (60) = 16 ms ca
+//K = 16 * 10^-3 * 25 * 10^6 = 400000 -> 0x61A80
+#define FPS_Time 0x00061A80
+
+
+//GAME MECHANICS INTERRUPTS PRIORITIES
+/*
+Pause button -> max pripority (0)
+RIT -> priority 1
+TIMER0 -> priority 2
+TIMER1 (60 sec counter) -> priority 3
+*/
+#define RIT_Priority 1
+#define TIM0_Priority 2
 
 
 /*
@@ -58,23 +110,20 @@ space for score, timer etc: (MAZESTART * XMAX) * 2 = 480
 static unsigned int maze[YMAX][XMAX] = {0};
 
 //PACMAN -> quadrato 2x2 celle. Disegno pixel per pixel
-static uint8_t player[16][16] = {
-    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, // Riga 1
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, // Riga 2
-    {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, // Riga 3
-    {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 4
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 5
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, // Riga 6
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, // Riga 7
-    {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, // Riga 8
-    {1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}, // Riga 9
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}, // Riga 10
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 11
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 12
-    {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 13
-    {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0}, // Riga 14
-    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, // Riga 15
-    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0}  // Riga 16
+//direction: right
+#define PLAYER_H PLAYER_CELLS_H * CELL_H
+#define PLAYER_W PLAYER_CELLS_W * CELL_W
+static uint8_t player[PLAYER_H][PLAYER_W] = {
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1}, // Riga 1
+    {0, 0, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 2
+    {0, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 3
+    {1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, // Riga 4
+    {1, 1, 1, 1, 0, 0, 0, 0, 0, 0}, // Riga 5
+    {1, 1, 1, 1, 0, 0, 0, 0, 0, 0}, // Riga 6
+    {1, 1, 1, 1, 1, 1, 0, 0, 0, 0}, // Riga 7
+    {0, 1, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 8
+    {0, 0, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 9
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1} // Riga 10
 };
 
 
