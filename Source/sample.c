@@ -146,7 +146,7 @@ int main(void)
 	
 	
 	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
-	drawPlayer(plX , plY, RIGHT_DIR);
+	drawPlayer(plX , plY, RIGHT_DIR, 0);
 	
 	//debug
 	//drawBlank(plX, plY);
@@ -155,8 +155,8 @@ int main(void)
 	playerDir = IDLE_DIR;
 	
 	//PILLS MANAGEMENT DA FARE ALLA FINE
-	//placePills4();
-	drawPills4();
+	placePills4();
+	//drawPills4();
 	
 	
 	//left tunnel

@@ -32,7 +32,12 @@
 #define PLAYER_CELLS_H 2
 #define PLAYER_CELLS_W 2
 
-//The labyrinth is mapped to a matrix of cells measuring 11x11
+//Standard pills dimensions in terms of pixels
+//Each standard pill occupied 2x2 cells so 10x10 pixels
+#define STDPILLS_CELLS_H 2
+#define STDPILLS_CELLS_W 2
+
+
 
 #define STD_PILLS 240
 #define PWR_PILLS 6
@@ -134,6 +139,33 @@ static uint8_t player[PLAYER_H][PLAYER_W] = {
     {0, 0, 0, 1, 1, 1, 1, 1, 1, 1} // Riga 10
 };
 
+static uint8_t playerEating[PLAYER_H][PLAYER_W] = {
+		{0, 0, 0, 1, 1, 1, 1, 0, 0, 0}, // Riga 1
+    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 2
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 3
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Riga 4
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Riga 5
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Riga 6
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // Riga 7
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 8
+    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 9
+    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0} // Riga 10
+};
+
+#define STDPILLS_H STDPILLS_CELLS_H * CELL_H
+#define STDPILLS_W STDPILLS_CELLS_W * CELL_W
+static uint8_t stdPill[STDPILLS_H][STDPILLS_W] = {
+		{0, 0, 0, 1, 1, 1, 1, 0, 0, 0}, // Riga 1
+    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 2
+    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 3
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 4
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 5
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 6
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 7
+    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 8
+    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 9
+    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0} // Riga 10
+};
 
 //DEBUG MOVEMENTS
 /*
@@ -144,7 +176,7 @@ static uint8_t player[PLAYER_H][PLAYER_W] = {
 
 //GFX
 void placePills4();
-void drawPills4();
+void drawPills4(uint16_t cellX, uint16_t cellY);
 void drawPills();
 void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
@@ -153,7 +185,8 @@ void drawBlanks();
 void drawBlank(uint16_t xS, uint16_t yS);
 uint16_t getPixelX(uint16_t cellX); 
 uint16_t getPixelY(uint16_t cellY); 
-void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction);
+void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t animation);
 void drawPlayerByPixels(uint16_t pixelX, uint16_t pixelY, uint8_t direction);
 void erasePlayer(uint16_t cellX, uint16_t cellY);
+void erasePill(uint16_t cellX, uint16_t cellY);
 #endif
