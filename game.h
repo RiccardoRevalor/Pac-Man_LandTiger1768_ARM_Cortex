@@ -79,12 +79,15 @@ extern uint16_t plY;
 
 
 //IN-GAME TIMINGS
-#define RIT_Time 0x004C4B40
+//1 ms
+#define RIT_Time 0x186A0  //0x004C4B40
 
 //Counter for Timer0: K = Freq * T
 //I want 60 FPS -> T = 1 / (60) = 16 ms ca
 //K = 16 * 10^-3 * 25 * 10^6 = 400000 -> 0x61A80
-#define FPS_Time 0x4C4B40  //0x98968 //0x00061A80 //FOR SLOWER FPS: 0x4C4B40 
+
+//2 ms
+#define FPS_Time 0xC350 //0x4C4B40  //0x98968 //0x00061A80 //FOR SLOWER FPS: 0x4C4B40 
 #define FPS_Time_DEBUG 0xBEBC20
 
 

@@ -122,6 +122,7 @@ void placePills4(){
 
 	 int y;
 	 int x;
+	 int pwrPillCounter = 0;
 	 int standardPills = STD_PILLS;
 	 int powerPills = PWR_PILLS;
 	
@@ -137,11 +138,17 @@ void placePills4(){
 						//if (1 == 1){
 							//maze[y][x] = 2; //put a new std pill here
 							maze[y][x] = STDPILL_CODE_1;       // Top-left
-              maze[y][x + 1] = STDPILL_CODE_2;   // Top-right
-              maze[y + 1][x] = STDPILL_CODE_2;   // Bottom-left
-              maze[y + 1][x + 1] = STDPILL_CODE_2; // Bottom-right
+              //maze[y][x + 1] = STDPILL_CODE_2;   // Top-right
+              //maze[y + 1][x] = STDPILL_CODE_2;   // Bottom-left
+              //maze[y + 1][x + 1] = STDPILL_CODE_2; // Bottom-right
 							standardPills --;
 						//}
+						
+						/*
+						POWER PILL:
+						metti counter e fai la probabilità solo per le 6 power pills
+						
+						*/
 						
 						
 						/* before: fill everything algorithm
@@ -153,16 +160,19 @@ void placePills4(){
 					}
 			}
 		}
-
+		
+		/*
+		PWR PILLS
     while (powerPills > 0) {
         int x = rand() % XMAX;
         int y = rand() % YMAX;
 
         if (maze[y][x] == FREE_CODE) { // Sostituisci pillola standard con power pill
-            maze[y][x] = 2; //PWRPILL_CODE_1;
+            maze[y][x] = STDPILL_CODE_1; //PWRPILL_CODE_1;
             powerPills--;
         }
     }
+		*/
 }
 
 void drawPills(){

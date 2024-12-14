@@ -156,7 +156,7 @@ int main(void)
 	
 	//PILLS MANAGEMENT DA FARE ALLA FINE
 	//placePills4();
-	//drawPills4();
+	drawPills4();
 	
 	
 	//left tunnel
