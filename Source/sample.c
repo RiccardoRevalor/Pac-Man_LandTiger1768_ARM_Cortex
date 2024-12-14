@@ -35,8 +35,10 @@ extern uint8_t ScaleFlag; // <- ScaleFlag needs to visible in order for the emul
 
 
 /* General variables for the game */
+unsigned int maze[YMAX][XMAX] = {0};
 uint8_t playerDir;
-
+uint16_t plX = XMAX / 2;
+uint16_t plY = YMAX / 2 + 2;
 
 int main(void)
 {
@@ -146,12 +148,15 @@ int main(void)
 	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
 	drawPlayer(plX , plY, RIGHT_DIR);
 	
+	//debug
+	//drawBlank(plX, plY);
+	
 	//SET DIR AS IDLE (DON'T MOVE UNLESS THE USERS TOUCHES THE JOYSTICK)
 	playerDir = IDLE_DIR;
 	
 	//PILLS MANAGEMENT DA FARE ALLA FINE
-	placePills4();
-	drawPills4();
+	//placePills4();
+	//drawPills4();
 	
 	
 	//left tunnel
@@ -171,7 +176,11 @@ int main(void)
 	init_RIT(RIT_Time);
 	
 	//START TIMER0 TO UPDATE GAME (60 FPS)
-	init_timer(0, FPS_Time);
+	if (DEBUG_MOVS == 1) {
+		init_timer(0, FPS_Time_DEBUG);
+	} else {
+		init_timer(0, FPS_Time);
+	}
 	
 	reset_RIT();
 	enable_RIT();

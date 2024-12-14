@@ -1,6 +1,7 @@
 #include "game.h"
 #include "stdlib.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 int countFreeCells() {
 	int sum = 0;
@@ -157,8 +158,8 @@ void placePills4(){
         int x = rand() % XMAX;
         int y = rand() % YMAX;
 
-        if (maze[y][x] == 0) { // Sostituisci pillola standard con power pill
-            maze[y][x] = 3;
+        if (maze[y][x] == FREE_CODE) { // Sostituisci pillola standard con power pill
+            maze[y][x] = 2; //PWRPILL_CODE_1;
             powerPills--;
         }
     }
@@ -313,6 +314,18 @@ void drawBlanks(){
 	}
 }
 
+void drawBlank(uint16_t xS, uint16_t yS){
+	uint16_t x0 = xS * CELL_W;
+      uint16_t y0 = yS * CELL_H;
+      uint16_t x1 = x0 + CELL_W - 1;
+      uint16_t y1 = y0 + CELL_H - 1;
+	
+	LCD_DrawLine(x0, y0, x1, y0, BACKGROUND_COLOR); // Linea superiore
+      LCD_DrawLine(x0, y0, x0, y1, BACKGROUND_COLOR); // Linea sinistra
+      LCD_DrawLine(x1, y0, x1, y1, BACKGROUND_COLOR); // Linea destra
+      LCD_DrawLine(x0, y1, x1, y1, BACKGROUND_COLOR); // Linea inferiore
+}
+
 
 void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height){
 	uint8_t x, y;
@@ -405,8 +418,8 @@ void rotatePlayer(uint8_t dest[PLAYER_H][PLAYER_W], uint8_t dir) {
 }
 
 
-uint16_t getPixelX(uint16_t cellX) { return cellX * CELL_W - 1;}; //cellX / XMAX;
-uint16_t getPixelY(uint16_t cellY) { return cellY * CELL_H - 1;}; //(cellY + MAZESTART) / YMAX;
+uint16_t getPixelX(uint16_t cellX) { return cellX * CELL_W;}; //cellX / XMAX;
+uint16_t getPixelY(uint16_t cellY) { return cellY * CELL_H;}; //(cellY + MAZESTART) / YMAX;
 
 void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction){
 	/*
@@ -439,9 +452,9 @@ void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction){
 			for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
 				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
 					if (player[cntY][cntX] == 1) {
-						LCD_SetPoint(x, y, PLAYER_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
+						if (LCD_GetPoint(x, y ) != PLAYER_COLOR) LCD_SetPoint(x, y, PLAYER_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
 					} else {
-						LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+						if (LCD_GetPoint(x, y ) != BACKGROUND_COLOR) LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
 					}
 					cntY++;
 				}
@@ -452,9 +465,9 @@ void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction){
 		for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
 				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
 					if (playerRotated[cntY][cntX] == 1) {
-						LCD_SetPoint(x, y, PLAYER_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
+						if (LCD_GetPoint(x, y ) != PLAYER_COLOR) LCD_SetPoint(x, y, PLAYER_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
 					} else {
-						LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+						if (LCD_GetPoint(x, y ) != BACKGROUND_COLOR) LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
 					}
 					cntY++;
 				}
@@ -485,6 +498,9 @@ void erasePlayer(uint16_t cellX, uint16_t cellY){
 				++cntX;
 	}
 }
+
+
+
 
 	
 	

@@ -49,6 +49,8 @@
 #define WALL_CODE 1
 #define STDPILL_CODE_1 2
 #define STDPILL_CODE_2 10
+#define PWRPILL_CODE_1 3
+#define PWRPILL_CODE_2 11
 #define TUNNEL_CODE 4
 #define DOOR_CODE 7
 #define PLAYER_CODE 9
@@ -72,8 +74,8 @@ extern uint8_t playerDir;
 
 //PLAYER POSITION
 //these are the default position at te beginning of a new game
-static uint16_t plX = XMAX / 2;
-static uint16_t plY = YMAX / 2 + 2;
+extern uint16_t plX;
+extern uint16_t plY;
 
 
 //IN-GAME TIMINGS
@@ -82,7 +84,8 @@ static uint16_t plY = YMAX / 2 + 2;
 //Counter for Timer0: K = Freq * T
 //I want 60 FPS -> T = 1 / (60) = 16 ms ca
 //K = 16 * 10^-3 * 25 * 10^6 = 400000 -> 0x61A80
-#define FPS_Time 0x4C4B40 //0x00061A80
+#define FPS_Time 0x4C4B40  //0x98968 //0x00061A80 //FOR SLOWER FPS: 0x4C4B40 
+#define FPS_Time_DEBUG 0xBEBC20
 
 
 //GAME MECHANICS INTERRUPTS PRIORITIES
@@ -92,8 +95,8 @@ RIT -> priority 1
 TIMER0 -> priority 2
 TIMER1 (60 sec counter) -> priority 3
 */
-#define RIT_Priority 0
-#define TIM0_Priority 5
+#define RIT_Priority 1
+#define TIM0_Priority 2
 
 
 /*
@@ -109,7 +112,7 @@ space for score, timer etc: (MAZESTART * XMAX) * 2 = 480
 */
 
 
-static unsigned int maze[YMAX][XMAX] = {0};
+extern unsigned int maze[YMAX][XMAX];
 
 //PACMAN -> quadrato 2x2 celle. Disegno pixel per pixel
 //direction: right
@@ -129,6 +132,13 @@ static uint8_t player[PLAYER_H][PLAYER_W] = {
 };
 
 
+//DEBUG MOVEMENTS
+/*
+0 -> DEBUG OFF
+1 -> DEBUG ON
+*/
+#define DEBUG_MOVS 0
+
 //GFX
 void placePills4();
 void drawPills4();
@@ -137,6 +147,7 @@ void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawTunnel(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawBlanks();
+void drawBlank(uint16_t xS, uint16_t yS);
 uint16_t getPixelX(uint16_t cellX); 
 uint16_t getPixelY(uint16_t cellY); 
 void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction);
