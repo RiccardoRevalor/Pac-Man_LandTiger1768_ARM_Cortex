@@ -7,8 +7,8 @@
 //colors scheme
 #define WALL_COLOR Blue
 #define BACKGROUND_COLOR Black
-#define STDPILL_COLOR Red
-#define HOUSEDOOR_COLOR Magenta
+#define STDPILL_COLOR Magenta
+#define HOUSEDOOR_COLOR Red
 #define PLAYER_COLOR Yellow
 
 //position of maze start
@@ -155,16 +155,16 @@ static uint8_t playerEating[PLAYER_H][PLAYER_W] = {
 #define STDPILLS_H STDPILLS_CELLS_H * CELL_H
 #define STDPILLS_W STDPILLS_CELLS_W * CELL_W
 static uint8_t stdPill[STDPILLS_H][STDPILLS_W] = {
-		{0, 0, 0, 1, 1, 1, 1, 0, 0, 0}, // Riga 1
-    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 2
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Riga 1
+    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}, // Riga 2
     {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 3
     {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 4
     {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 5
     {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 6
     {0, 1, 1, 1, 1, 1, 1, 1, 1, 0}, // Riga 7
     {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 8
-    {0, 0, 1, 1, 1, 1, 1, 1, 0, 0}, // Riga 9
-    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0} // Riga 10
+    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}, // Riga 9
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0} // Riga 10
 };
 
 //DEBUG MOVEMENTS
@@ -179,6 +179,7 @@ void placePills4();
 void drawPills4(uint16_t cellX, uint16_t cellY);
 void drawPills();
 void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
+void drawMapWalls();
 void drawDoor(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawTunnel(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawBlanks();

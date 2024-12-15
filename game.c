@@ -133,8 +133,9 @@ void placePills4(){
 		 for (y = MAZESTART; y <= YMAX - MAZESTART - 1 && standardPills > 0; y++) {
 					for (x = 1; x <= XMAX - 1 && standardPills > 0; x++) {
 						
-						//if (maze[y][x] != 0) continue; //|| maze[y + 2][x + 1] != 0
-						if (maze[y][x] != FREE_CODE || maze[y][x + 1] != FREE_CODE || maze[y][x-1] != FREE_CODE || maze[y][x+2] != FREE_CODE || maze[y + 1][x] != FREE_CODE || maze[y + 1][x + 1] != FREE_CODE || maze[y + 1][x + 2] != FREE_CODE) continue;
+						//if (maze[y][x] != 0) continue; //|| maze[y + 2][x + 1] != 0 || maze[y + 1][x + 2] || maze[y][x+2] != FREE_CODE
+						//prima c'era: maze[y][x-1] != FREE_CODE
+						if (maze[y][x] != FREE_CODE || maze[y][x + 1] != FREE_CODE || maze[y + 1][x] != FREE_CODE || maze[y + 1][x + 1] != FREE_CODE ) continue;
 						//if (!isAreaFree(y,x,1)) continue;
 						float probCell = (float)rand()/(float)(RAND_MAX);
 				
@@ -267,7 +268,7 @@ void drawPills4(uint16_t cellX, uint16_t cellY) {
 
 
 
-void drawPerimeterWalls(){
+void drawMapWalls(){
 	int y;
 	int x;
 	for (y = 0; y < YMAX; y++){
