@@ -48,6 +48,7 @@ void TIMER0_IRQHandler (void)
             // Mangia la STDPILL
             // TODO: gestione punteggio o stato
             erasePlayer(plX, plY);
+						erasePill(lookAheadX, plY);
             drawPlayer(nextX, plY, playerDir, 1);
 						plX = nextX;
         } else if (((maze[plY][lookAheadX] == STDPILL_CODE_1 || maze[plY][lookAheadX] == STDPILL_CODE_2) && maze[plY+1][lookAheadX] == FREE_CODE) || ((maze[plY+1][lookAheadX] == STDPILL_CODE_1 || maze[plY+1][lookAheadX] == STDPILL_CODE_2) && maze[plY][lookAheadX] == FREE_CODE)) {
@@ -97,10 +98,17 @@ void TIMER0_IRQHandler (void)
             // Mangia la STDPILL
             // TODO: gestione punteggio o stato
             erasePlayer(plX, plY);
+						erasePill(nextX-1, plY);
             drawPlayer(nextX, plY, playerDir, 1);
 						plX = nextX;
         } else if (((maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) && maze[plY+1][nextX] == FREE_CODE) || ((maze[plY+1][nextX] == STDPILL_CODE_1 || maze[plY+1][nextX] == STDPILL_CODE_2) && maze[plY][nextX] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
+					if (maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) {
+						//find the leftmost upper cell of the pill and erase the whole pill
+						erasePill(nextX-1, plY-1);
+					} else {
+						erasePill(nextX-1, plY);
+					}
 					erasePlayer(plX, plY);
           drawPlayer(nextX, plY, playerDir, 1);
 					plX = nextX;
@@ -130,10 +138,16 @@ void TIMER0_IRQHandler (void)
 						plY = nextY;
         } else if ((maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) && (maze[nextY][plX+1] == STDPILL_CODE_1 || maze[nextY][plX+1] == STDPILL_CODE_2)) {
             erasePlayer(plX, plY);
+						erasePill(plX, nextY-1);
             drawPlayer(plX, nextY, playerDir, 1);
 						plY = nextY;
         } else if (((maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) && maze[nextY][plX+1] == FREE_CODE) || ((maze[nextY][plX+1] == STDPILL_CODE_1 || maze[nextY][plX+1] == STDPILL_CODE_2) && maze[nextY][plX] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
+						if (maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2){
+							erasePill(plX-1, nextY-1);
+						} else {
+							erasePill(plX+1, nextY-1);
+						}
 						erasePlayer(plX, plY);
             drawPlayer(plX, nextY, playerDir, 1);
 						plY = nextY;
@@ -164,10 +178,16 @@ void TIMER0_IRQHandler (void)
 						plY = nextY;
         } else if ((maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) && (maze[lookAheadY][plX+1] == STDPILL_CODE_1 || maze[lookAheadY][plX+1] == STDPILL_CODE_2)) {
             erasePlayer(plX, plY);
+						erasePill(plX, lookAheadY);
             drawPlayer(plX, nextY, playerDir, 1);
 						plY = nextY;
         } else if (((maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) && maze[lookAheadY][plX+1] == FREE_CODE) || ((maze[lookAheadY][plX+1] == STDPILL_CODE_1 || maze[lookAheadY][plX+1] == STDPILL_CODE_2) && maze[lookAheadY][plX] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
+						if (maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) {
+							erasePill(plX-1, lookAheadY);
+						} else {
+							erasePill(plX+1, lookAheadY);
+						}
 						erasePlayer(plX, plY);
             drawPlayer(plX, nextY, playerDir, 1);
 						plY = nextY;
