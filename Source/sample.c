@@ -116,10 +116,15 @@ unsigned int maze[YMAX][XMAX] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 
 
 
-
 uint8_t playerDir;
 uint16_t plX = XMAX / 2 - 1;
 uint16_t plY = YMAX / 2;
+uint16_t score = 0;
+uint16_t life = 1;
+uint8_t gameTime = 0;
+
+uint8_t pwrPills[PWR_PILLS][2] = {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}};
+uint8_t pwrPillsCounter = 0;
 
 int main(void)
 {
@@ -269,9 +274,12 @@ int main(void)
 		init_timer(0, FPS_Time);
 	}
 	
+	init_timer(1, TimeCounter_Time);
+	
 	reset_RIT();
 	enable_RIT();
 	enable_timer(0);
+	enable_timer(1);
 	
 	
 	

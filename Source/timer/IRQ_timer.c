@@ -234,6 +234,20 @@ void TIMER0_IRQHandler (void)
 		
 		lastDir = playerDir;
 }
+	
+
+	/*
+	//Update GUI TEXT
+	//Write 'SCORE' string
+	//MAX achievable score: 236 * 10 + 6*50 = 2660 -> 4 digits
+	GUI_Text(getPixelX(SCORE_X), getPixelY(SCORE_Y), (uint8_t *) "SCORE:0000", White, BACKGROUND_COLOR);
+	//60 seconds time counter
+	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "60", White, BACKGROUND_COLOR);
+	//Lives
+	char lifeS[100];
+	sprintf(lifeS, "Lives: %d", life);
+	GUI_Text(getPixelX(LIFECNT_X), getPixelY(LIFECNT_Y), (uint8_t *) lifeS, White, BACKGROUND_COLOR);
+*/
 
   LPC_TIM0->IR = 1;			/* clear interrupt flag */
   return;
@@ -251,6 +265,75 @@ void TIMER0_IRQHandler (void)
 ******************************************************************************/
 void TIMER1_IRQHandler (void)
 {
+	
+
+	/*
+	
+	TIMER 1
+	Tasks:
+	1) every n seconds, generate a power pill until we have a total of 6 powerpills (conuting even the already eaten ones) on the map
+	2) every second decrement the 60 seconds time counter
+	3) if the timer counter reaches 0, show GAME OVER Screen
+	
+	*/
+	
+	//increment gameTime by 1 time unit
+	++gameTime;
+	
+	//every 10 seconds, add a new power pill
+	//so after 10 seconds -> 1 power pill
+	//after 20 seconds -> 2 power pill (counting also the-maybe-eaten ones)
+	//and so on...
+	if (gameTime % 10 == 0){
+		if (pwrPillsCounter < 6) {
+			
+			//generate a new power pill
+			//choose the line in which turn a std pill into a power pill
+			int totalPills = 0;
+			int x, y;
+
+			// Conta il numero totale di pillole nella matrice
+			for (y = MAZESTART + 1; y < YMAX - MAZESTART - 1; y++) {
+					for (x = 1; x < XMAX - 1; x++) {
+							if (maze[y][x] == STDPILL_CODE_1) {
+									totalPills++;
+							}
+					}
+			}
+			
+			if (totalPills > 0) {
+				int targetPill = rand() % totalPills + 1; // Seleziona l'ennesima pillola
+				int currentPill = 0;
+
+				for (y = MAZESTART + 1; y < YMAX - MAZESTART - 1; y++) {
+						for (x = 1; x < XMAX - 1; x++) {
+								if (maze[y][x] == STDPILL_CODE_1) {
+										currentPill++;
+										if (currentPill == targetPill) {
+												// Trasforma questa pillola in una power pill
+												maze[y][x] = PWRPILL_CODE_1; // Top Left -> set the pwrpill code
+												//set the other 3 cells (at positions (x+1,y),(x+1,y+1),(x,y+1)) to PWRPILL_CODE_2
+												maze[y][x + 1] = PWRPILL_CODE_2;   // Top-right
+												maze[y + 1][x] = PWRPILL_CODE_2;   // Bottom-left
+												maze[y + 1][x + 1] = PWRPILL_CODE_2; // Bottom-right
+												//draw the PWRPILL setting 1 to the power pill boolean case
+												drawPills4(x, y, 1);
+											
+												//increment the power pills counter by 1 unit
+												++pwrPillsCounter;
+												return;
+										}
+								}
+						}
+				}
+				
+				
+				
+			}
+		}
+		
+	}
+	
   LPC_TIM1->IR = 1;			/* clear interrupt flag */
   return;
 }

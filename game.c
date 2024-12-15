@@ -145,8 +145,10 @@ void placePills4(){
             maze[y + 1][x] = STDPILL_CODE_2;   // Bottom-left
             maze[y + 1][x + 1] = STDPILL_CODE_2; // Bottom-right
 						
+						//save also the newly added pill in the stdpill matrix
+						//pillsCells[y][x] = STDPILL_CODE_1;
 						
-						drawPills4(x, y);
+						drawPills4(x, y, 0);
 						
 						standardPills --;
 					}
@@ -246,7 +248,7 @@ void drawPills4(){
 */
 
 
-void drawPills4(uint16_t cellX, uint16_t cellY) {
+void drawPills4(uint16_t cellX, uint16_t cellY, uint8_t isPowerPill) {
     uint16_t xcell = getPixelX(cellX); // Converte la posizione in celle nei pixel X
     uint16_t ycell = getPixelY(cellY); // Converte la posizione in celle nei pixel Y
     uint16_t px, py;
@@ -256,7 +258,11 @@ void drawPills4(uint16_t cellX, uint16_t cellY) {
         for (py = 0; py < STDPILLS_H; py++) {
             if (stdPill[py][px] == 1) {
                 // Disegna il pixel con il colore della pillola
-                LCD_SetPoint(xcell + px, ycell + py, STDPILL_COLOR);
+								if (isPowerPill == 0) {
+									LCD_SetPoint(xcell + px, ycell + py, STDPILL_COLOR);
+								} else {
+									LCD_SetPoint(xcell + px, ycell + py, PWRPILL_COLOR);
+								}
             } else {
                 // Disegna il pixel con il colore dello sfondo
                 LCD_SetPoint(xcell + px, ycell + py, BACKGROUND_COLOR);
@@ -549,6 +555,9 @@ void erasePill(uint16_t cellX, uint16_t cellY){
 	maze[cellY+1][cellX] = FREE_CODE;
 	maze[cellY][cellX+1] = FREE_CODE;
 	maze[cellY+1][cellX+1] = FREE_CODE;
+	
+	//remove the stdpill from the pills matrix as well
+	//pillsCells[cellY][cellX] = FREE_CODE;
 	
 	for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
 				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {

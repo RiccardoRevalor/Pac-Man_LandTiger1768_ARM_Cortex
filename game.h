@@ -8,6 +8,7 @@
 #define WALL_COLOR Blue
 #define BACKGROUND_COLOR Black
 #define STDPILL_COLOR Magenta
+#define PWRPILL_COLOR Green
 #define HOUSEDOOR_COLOR Red
 #define PLAYER_COLOR Yellow
 
@@ -84,6 +85,16 @@ extern uint16_t plY;
 
 
 //IN-GAME TIMINGS
+//60 seconds timer
+//in the simulator approximately: 1 sec (real time) = 10 ms (simulator time) [ca]
+//so set the time interval to 10 ms
+//10 ms * 25c Mhz = 250000
+#define TimeCounter_Time 0x17D7840
+//60 seconds time variable
+extern uint8_t gameTime; //at first it's equal to 0 (defined in sample.c)
+#define GAMETIME_LIMIT 60 //after that, the current game ends
+
+
 //1 ms
 #define RIT_Time 0x186A0  //0x004C4B40
 
@@ -121,6 +132,7 @@ space for score, timer etc: (MAZESTART * XMAX) * 2 = 480
 
 
 extern unsigned int maze[YMAX][XMAX];
+
 
 //PACMAN -> quadrato 2x2 celle. Disegno pixel per pixel
 //direction: right
@@ -167,12 +179,31 @@ static uint8_t stdPill[STDPILLS_H][STDPILLS_W] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0} // Riga 10
 };
 
+
+extern uint8_t pwrPillsCounter;
+
+
 //TUNNELS SPECIFICATIONS
 #define LT_X 0
 #define RT_X XMAX - 1
 #define T_Y (YMAX - 2*MAZESTART) / 2 - 1
 #define T_HEIGTH 8
 #define T_WIDTH 1
+
+//SCORE, LIVE
+extern uint16_t score;
+extern uint16_t life;
+
+//GUI TEXTS
+//SCORE POSITION
+#define SCORE_X XMAX - 17
+#define SCORE_Y 1
+//60 SECONDS COUNTER
+#define TIMECNT_X 1
+#define TIMECNT_Y 1
+//LIVES
+#define LIFECNT_X 1
+#define LIFECNT_Y YMAX - 4
 
 //DEBUG MOVEMENTS
 /*
@@ -183,7 +214,7 @@ static uint8_t stdPill[STDPILLS_H][STDPILLS_W] = {
 
 //GFX
 void placePills4();
-void drawPills4(uint16_t cellX, uint16_t cellY);
+void drawPills4(uint16_t cellX, uint16_t cellY, uint8_t isPowerPill);
 void drawPills();
 void drawWalls(uint16_t xS, uint16_t yS, uint16_t width, uint16_t height);
 void drawMapWalls();
