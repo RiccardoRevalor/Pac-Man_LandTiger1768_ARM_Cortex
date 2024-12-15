@@ -167,6 +167,13 @@ static uint8_t stdPill[STDPILLS_H][STDPILLS_W] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0} // Riga 10
 };
 
+//TUNNELS SPECIFICATIONS
+#define LT_X 0
+#define RT_X XMAX - 1
+#define T_Y (YMAX - 2*MAZESTART) / 2 - 1
+#define T_HEIGTH 8
+#define T_WIDTH 1
+
 //DEBUG MOVEMENTS
 /*
 0 -> DEBUG OFF

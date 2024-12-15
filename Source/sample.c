@@ -247,9 +247,9 @@ int main(void)
 	
 	
 	//left tunnel
-	drawTunnel(0, (YMAX - 2*MAZESTART) / 2, 1, 7);
+	drawTunnel(RT_X, T_Y, T_WIDTH, T_HEIGTH);
 	//right tunnel
-	drawTunnel(XMAX - 1, (YMAX - 2*MAZESTART) / 2, 1, 7);
+	drawTunnel(LT_X, T_Y, T_WIDTH, T_HEIGTH);
 	
 	//drawBlanks();
 	

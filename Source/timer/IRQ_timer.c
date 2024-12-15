@@ -67,7 +67,14 @@ void TIMER0_IRQHandler (void)
           drawPlayer(nextX, plY, playerDir, 1);
 					plX = nextX;
 				
-				}else {
+				} else if (maze[plY][lookAheadX] == TUNNEL_CODE && maze[plY+1][lookAheadX] == TUNNEL_CODE){
+					//the next player position is the entrance of the LEFT TUNNEL
+					//the player will be teleported to the RIGTH TUNNEL mantaining the same direction
+					//set the new player's coordinates!
+					erasePlayer(plX, plY);
+					drawPlayer(LT_X+1, plY, playerDir, 1);
+					plX = LT_X+1;
+				} else {
 					playerDir = IDLE_DIR;
 				}
 				//drawBlank(nextX, plY);
@@ -113,6 +120,13 @@ void TIMER0_IRQHandler (void)
           drawPlayer(nextX, plY, playerDir, 1);
 					plX = nextX;
 				
+				} else if (maze[plY][nextX] == TUNNEL_CODE && maze[plY+1][nextX] == TUNNEL_CODE){
+					//the next player position is the entrance of the LEFT TUNNEL
+					//the player will be teleported to the RIGTH TUNNEL mantaining the same direction
+					//set the new player's coordinates!
+					erasePlayer(plX, plY);
+					drawPlayer(RT_X-2, plY, playerDir, 1);
+					plX = RT_X-2;
 				}else {
 					playerDir = IDLE_DIR;
 				}
