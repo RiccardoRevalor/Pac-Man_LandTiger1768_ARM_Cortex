@@ -571,6 +571,33 @@ void erasePill(uint16_t cellX, uint16_t cellY){
 }
 
 
+void showGameOver(){
+	
+	
+	
+	LCD_Clear(BACKGROUND_COLOR);
+		
+		
+		
+		
+		
+	uint16_t x, y;
+	uint16_t cntX = 0, cntY = 0;
+	uint16_t xplayer = getPixelX(0), yplayer = getPixelY(MAZESTART + 10);
+	for (x = xplayer; x < xplayer + XMAX * CELL_W; x++) {
+				for (y = yplayer; y < YMAX * CELL_H; y++) {
+					if (gameOverGfxMap[y][x] != 0) {
+						LCD_SetPoint(x, y, White); //set the background color in the zeros of the player matrix to create space from other props
+					}
+					cntY++;
+				}
+				cntY = 0;
+				++cntX;
+	}
+	GUI_Text(getPixelX(XMAX / 2 - 7), getPixelY(2), (uint8_t *) "GAME OVER!", Red, BACKGROUND_COLOR);
+	
+}
+
 
 
 	

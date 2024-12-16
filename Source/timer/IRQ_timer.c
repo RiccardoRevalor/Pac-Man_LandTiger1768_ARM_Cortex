@@ -106,6 +106,42 @@ void TIMER0_IRQHandler (void)
           drawPlayer(nextX, plY, playerDir, 1);
 					plX = nextX;
 				
+				} else if ((maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) && (maze[plY+1][lookAheadX] == PWRPILL_CODE_1 || maze[plY+1][lookAheadX] == PWRPILL_CODE_2)) {
+            // Mangia la PWRPILL
+            // TODO: gestione punteggio o stato
+				
+						//Score update
+						score+=50;
+						scoreNeedsRedraw=1;
+						//updateScoreString();
+				
+            erasePlayer(plX, plY);
+						erasePill(lookAheadX, plY);
+            drawPlayer(nextX, plY, playerDir, 1);
+						plX = nextX;
+			
+						
+        } else if (((maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) && maze[plY+1][lookAheadX] == FREE_CODE) || ((maze[plY+1][lookAheadX] == PWRPILL_CODE_1 || maze[plY+1][lookAheadX] == PWRPILL_CODE_2) && maze[plY][lookAheadX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
+					
+					//Score update
+					score+=50;
+					scoreNeedsRedraw=1;
+				
+				
+					//2 cases: upper lookahead block contains STDPILL_CODE_2 or lower lookahead block contains STDPILL_CODE_2
+					if (maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) {
+						//get the "source cell" (so the leftmost upper of the 2x2 square) cell of the pill
+						//and delete the FULL pill
+						erasePill(lookAheadX, plY-1);
+					} else {
+						//this is just the leftmost upper cell of the 2x2 pill
+						erasePill(lookAheadX, plY);
+					}
+					erasePlayer(plX, plY);
+          drawPlayer(nextX, plY, playerDir, 1);
+					plX = nextX;
+				
 				} else if (maze[plY][lookAheadX] == TUNNEL_CODE && maze[plY+1][lookAheadX] == TUNNEL_CODE){
 					//the next player position is the entrance of the LEFT TUNNEL
 					//the player will be teleported to the RIGTH TUNNEL mantaining the same direction
@@ -161,6 +197,37 @@ void TIMER0_IRQHandler (void)
 				
 				
 					if (maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) {
+						//find the leftmost upper cell of the pill and erase the whole pill
+						erasePill(nextX-1, plY-1);
+					} else {
+						erasePill(nextX-1, plY);
+					}
+					erasePlayer(plX, plY);
+          drawPlayer(nextX, plY, playerDir, 1);
+					plX = nextX;
+				
+				} else if ((maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) && (maze[plY+1][nextX] == PWRPILL_CODE_1 || maze[plY+1][nextX] == PWRPILL_CODE_2)) {
+						//PURE CHUNK OF 2x2 PWRPILL BLOCKS
+            // Mangia la STDPILL
+            // TODO: gestione punteggio o stato
+				
+						//Score update
+						score+=50;
+						scoreNeedsRedraw=1;
+				
+            erasePlayer(plX, plY);
+						erasePill(nextX-1, plY);
+            drawPlayer(nextX, plY, playerDir, 1);
+						plX = nextX;
+        } else if (((maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) && maze[plY+1][nextX] == FREE_CODE) || ((maze[plY+1][nextX] == PWRPILL_CODE_1 || maze[plY+1][nextX] == PWRPILL_CODE_2) && maze[plY][nextX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
+				
+					//Score update
+					score+=50;
+					scoreNeedsRedraw=1;
+				
+				
+					if (maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) {
 						//find the leftmost upper cell of the pill and erase the whole pill
 						erasePill(nextX-1, plY-1);
 					} else {
@@ -228,6 +295,34 @@ void TIMER0_IRQHandler (void)
             drawPlayer(plX, nextY, playerDir, 1);
 						plY = nextY;
 				
+				} else if ((maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2) && (maze[nextY][plX+1] == PWRPILL_CODE_1 || maze[nextY][plX+1] == PWRPILL_CODE_2)) {
+            //FULL PWR PILL 
+						//Score update
+						score+=50;
+						scoreNeedsRedraw=1;
+				
+				
+						erasePlayer(plX, plY);
+						erasePill(plX, nextY-1);
+            drawPlayer(plX, nextY, playerDir, 1);
+						plY = nextY;
+        } else if (((maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2) && maze[nextY][plX+1] == FREE_CODE) || ((maze[nextY][plX+1] == PWRPILL_CODE_1 || maze[nextY][plX+1] == PWRPILL_CODE_2) && maze[nextY][plX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
+						
+				
+						//Score update
+						score+=50;
+						scoreNeedsRedraw=1;
+				
+						if (maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2){
+							erasePill(plX-1, nextY-1);
+						} else {
+							erasePill(plX+1, nextY-1);
+						}
+						erasePlayer(plX, plY);
+            drawPlayer(plX, nextY, playerDir, 1);
+						plY = nextY;
+				
 				} else {
 					playerDir = IDLE_DIR;
 					
@@ -272,6 +367,34 @@ void TIMER0_IRQHandler (void)
 				
 				
 						if (maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) {
+							erasePill(plX-1, lookAheadY);
+						} else {
+							erasePill(plX+1, lookAheadY);
+						}
+						erasePlayer(plX, plY);
+            drawPlayer(plX, nextY, playerDir, 1);
+						plY = nextY;
+				
+				} else if ((maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) && (maze[lookAheadY][plX+1] == PWRPILL_CODE_1 || maze[lookAheadY][plX+1] == PWRPILL_CODE_2)) {
+            //FULL PWR PILL
+						//Score update
+						score+=50;
+						scoreNeedsRedraw=1;
+				
+				
+						erasePlayer(plX, plY);
+						erasePill(plX, lookAheadY);
+            drawPlayer(plX, nextY, playerDir, 1);
+						plY = nextY;
+        } else if (((maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) && maze[lookAheadY][plX+1] == FREE_CODE) || ((maze[lookAheadY][plX+1] == PWRPILL_CODE_1 || maze[lookAheadY][plX+1] == PWRPILL_CODE_2) && maze[lookAheadY][plX] == FREE_CODE)) {
+						//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
+						
+						//Score update
+						score+=50;
+						scoreNeedsRedraw=1;
+				
+				
+						if (maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) {
 							erasePill(plX-1, lookAheadY);
 						} else {
 							erasePill(plX+1, lookAheadY);
@@ -418,20 +541,22 @@ void TIMER1_IRQHandler (void)
 	--gameTime;
 	updateGameTimeString();
 	
-	//if (gameTime <= 0) {
+	if (gameTime <= 0) {
 		
 		//RESET AND DISABLE ALL THE OTHERS TIMER
-		//reset_timer(0);
-		//disable_timer(0);
+		reset_timer(0);
+		disable_timer(0);
 		
-		//showGameOver();
+		showGameOver();
 		
 		//at last, disable itself
-		//reset_timer(1);
-		//disable_timer(1);
+		reset_timer(1);
+		disable_timer(1);
+		LPC_TIM1->IR = 1;			/* clear interrupt flag */
+		return;
 		
 		
-	//}
+	}
 	
   LPC_TIM1->IR = 1;			/* clear interrupt flag */
   return;
