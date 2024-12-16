@@ -89,22 +89,50 @@ extern uint16_t plY;
 //in the simulator approximately: 1 sec (real time) = 10 ms (simulator time) [ca]
 //so set the time interval to 10 ms
 //10 ms * 25c Mhz = 250000
-#define TimeCounter_Time 0x17D7840
+
+/*
+60 secondi
+ho la timescale: Tempo base = 1 ms reale -> 0.00001024 s emulatore
+1 s = 1000 ms
+1000 / 1 = x = 0.00001024 -> x = 0.00001024 x 1000 = 0.01024 nell'emulatore
+
+
+*/
+#define TimeCounter_Time 0x3E800 //0x17D7840
 //60 seconds time variable
-extern uint8_t gameTime; //at first it's equal to 0 (defined in sample.c)
+extern uint16_t gameTime; //at first it's equal to 0 (defined in sample.c)
 #define GAMETIME_LIMIT 60 //after that, the current game ends
 
 
-//1 ms
-#define RIT_Time 0x186A0  //0x004C4B40
 
 //Counter for Timer0: K = Freq * T
 //I want 60 FPS -> T = 1 / (60) = 16 ms ca
 //K = 16 * 10^-3 * 25 * 10^6 = 400000 -> 0x61A80
 
 //2 ms
-#define FPS_Time 0xC350 //0x4C4B40  //0x98968 //0x00061A80 //FOR SLOWER FPS: 0x4C4B40 
+//#define FPS_Time 0xC350 //0x4C4B40  //0x98968 //0x00061A80 //FOR SLOWER FPS: 0x4C4B40 
+/*
+Senza impostare il timescale sull'emulatore.
+Voglio 30 fps = 1 / 32 ms circa
+Tempo base = 1 ms reale -> 0.00001024 s emulatore
+Faccio 32 x 0.00001024 s x 25 Mhz = 8192 -> 0x2000
+*/
+#define FPS_Time 0x2000
 #define FPS_Time_DEBUG 0xBEBC20
+
+
+//1 ms
+//#define RIT_Time 0x186A0  //0x004C4B40
+/*
+Metto il contatore dimezzato rispetto a quello del timer0 per privilegiare gli input
+16 x 0.00001024 x 25 Mhz = 4096 -> 0x1000
+*/
+#define RIT_Time 0x1000
+
+
+//Timer to redraw GUI Texts
+//3 ms
+#define TextRedraw_Time 0x2000 //0x124F8
 
 
 //GAME MECHANICS INTERRUPTS PRIORITIES
@@ -116,6 +144,8 @@ TIMER1 (60 sec counter) -> priority 3
 */
 #define RIT_Priority 1
 #define TIM0_Priority 2
+#define TIM1_Priority 5
+#define TIM2_Priority 2
 
 
 /*
@@ -228,4 +258,5 @@ void drawPlayer(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t anima
 void drawPlayerByPixels(uint16_t pixelX, uint16_t pixelY, uint8_t direction);
 void erasePlayer(uint16_t cellX, uint16_t cellY);
 void erasePill(uint16_t cellX, uint16_t cellY);
+//void showGameOver();
 #endif

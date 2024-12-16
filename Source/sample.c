@@ -121,7 +121,7 @@ uint16_t plX = XMAX / 2 - 1;
 uint16_t plY = YMAX / 2;
 uint16_t score = 0;
 uint16_t life = 1;
-uint8_t gameTime = 0;
+uint16_t gameTime = 60;
 
 uint8_t pwrPills[PWR_PILLS][2] = {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}};
 uint8_t pwrPillsCounter = 0;
@@ -134,107 +134,23 @@ int main(void)
 	
   LCD_Initialization();
 	
+	
+	
 	//TO DO: POTENZIOMETRO COME SEED DEL RAND()
 	
   //TP_Init();
 	//TouchPanel_Calibrate();
 	
 	LCD_Clear(BACKGROUND_COLOR);
+	GUI_Text(getPixelX(SCORE_X), getPixelY(SCORE_Y), (uint8_t *) "SCORE:", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(SCORE_X+10), getPixelY(SCORE_Y), (uint8_t *) "0000", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(LIFECNT_X), getPixelY(LIFECNT_Y), (uint8_t *) "Lives:", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(LIFECNT_X+10), getPixelY(LIFECNT_Y), (uint8_t *) "1", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "Time:", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(TIMECNT_X+8), getPixelY(TIMECNT_Y), (uint8_t *) "60", White, BACKGROUND_COLOR);
 	
-	
-	//draw perimeter walls
-	
-	/*
-	drawWalls(0, MAZESTART, XMAX, 1);														//upper perimeter
-	drawWalls(0, YMAX - MAZESTART - 1, XMAX, 1);								//lower perimeter
-	drawWalls(0, MAZESTART, 1, YMAX - 2*MAZESTART);							//left perimeter
-	drawWalls(XMAX - 1, MAZESTART, 1, YMAX - 2*MAZESTART); 			//right perimeter
-	*/
-	
-	//CASETTA IN MEZZO
-	/*
-	drawWalls(XMAX / 2 - 4, YMAX / 2, 8, 2); //base  sotto
-	drawWalls(XMAX / 2 - 6, YMAX / 2 - 4, 2, 6); //lato sx
-	drawWalls(XMAX / 2 + 4, YMAX / 2 - 4, 2, 6); //lato dx
-	drawWalls(XMAX / 2 - 6, YMAX / 2 - 4, 4, 2); //anta pre-porta sx
-	drawWalls(XMAX / 2 + 2, YMAX / 2 - 4, 2, 2);		//anta pre-porta dx
-	drawDoor(XMAX / 2 - 2, YMAX / 2 - 4, 4, 1);			//porta
-	*/
-	//drawWalls();
-	//drawWalls(38, YMAX /2 - 5, 12, 2);
-
-	
-	//NUOVA MAPPA
-	/*
-	drawWalls(24, MAZESTART + 2, 2, 5);
-	drawWalls(13, MAZESTART + 5, 7, 2);
-	drawWalls(6, MAZESTART + 5, 3, 2);
-	drawWalls(6, MAZESTART + 11, 3, 8);
-  drawWalls(13, MAZESTART + 11, 2, 6);
-	drawWalls(13, MAZESTART + 17, 6, 2);
-	drawWalls(19, MAZESTART + 11, 11, 2);
-	drawWalls(23, MAZESTART + 13, 3, 6);
-	drawWalls(30, MAZESTART + 5, 7, 2);
-	drawWalls(41, MAZESTART + 5, 1, 2);
-	drawWalls(34, MAZESTART + 11, 8, 3);
-	drawWalls(34, MAZESTART + 18, 8, 3);
-	drawWalls(13, YMAX - MAZESTART - 8, 7, 2);
-	drawWalls(6, YMAX - MAZESTART - 8, 3, 2);
-	drawWalls(24, YMAX - MAZESTART - 8, 3, 2);
-	drawWalls(36, YMAX - MAZESTART - 8, 6, 2);
-	drawWalls(6, YMAX - MAZESTART - 14, 14, 2);
-	drawWalls(24, YMAX - MAZESTART - 14, 10, 2);
-	drawWalls(6, YMAX - MAZESTART - 20, 2, 6);
-	drawWalls(XMAX - 2 - 4, YMAX - MAZESTART - 20, 4, 2);
-	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 - 4, 2, 8);
-	drawWalls(XMAX /4, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
-	*/
 	
 	drawMapWalls();
-	/*
-	// Muri interni
-	
-
-	//sottoquadrante alto
-  drawWalls(XMAX / 2 - 1, MAZESTART + 2, 2, 8);
-	drawWalls(XMAX / 2 - 1 - 4, MAZESTART + 12, 10, 2);
-	drawWalls(XMAX / 2 - 1 - 4 + 4, MAZESTART + 14, 2, 6);
-	
-	drawWalls(XMAX /4 - 6 , MAZESTART + 4, 4, 6);
-	drawWalls(XMAX /4 , MAZESTART + 4, 6, 6);
-	
-	drawWalls(XMAX - (XMAX /4) - 6, MAZESTART + 4, 4, 6);
-	drawWalls(XMAX - (XMAX /4), MAZESTART + 4, 6, 6);
-	
-	drawWalls(XMAX - (XMAX /4) - 5, MAZESTART + 12, 10, 2);
-	drawWalls(XMAX /4 - 6, MAZESTART + 12, 10, 2);
-	
-	drawWalls(XMAX - (XMAX / 2) + 1, MAZESTART + 2, 2, 8);
-	drawWalls(XMAX - (XMAX / 2) + 1 - 4, MAZESTART + 12, 10, 2);
-	drawWalls(XMAX - (XMAX / 2) + 1 - 4 + 4, MAZESTART + 14, 2, 6);
-	
-	//sottoquadrante basso
-	drawWalls(XMAX /4 - 6 , YMAX - 2*MAZESTART - 5, 4, 6);
-	drawWalls(XMAX /4 , YMAX - 2*MAZESTART - 5, 6, 6);
-	
-	drawWalls(XMAX - (XMAX /4) - 6, YMAX - 2*MAZESTART - 5, 4, 6);
-	drawWalls(XMAX - (XMAX /4), YMAX - 2*MAZESTART - 5, 6, 6);
-	
-	drawWalls(XMAX - (XMAX /4) - 5, YMAX - 2*MAZESTART - 13, 10, 2);
-	drawWalls(XMAX /4 - 6, YMAX - 2*MAZESTART - 13, 10, 2);
-	
-	
-	drawWalls(XMAX / 2 - 1, YMAX - 2*MAZESTART - 3, 4, 8);
-	drawWalls(XMAX / 2 - 1 - 4, YMAX - 2*MAZESTART - 13, 10, 2);
-	//drawWalls(XMAX / 2 - 1 - 4 + 4, MAZESTART + 14, 2, 6);
-	
-	drawWalls(XMAX /4 - 2, (YMAX - 2*MAZESTART) / 2 - 6, 2, 8);
-	drawWalls(XMAX /4 - 2, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
-	
-	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 - 6, 2, 8);
-	drawWalls(XMAX - (XMAX /4) - 2, (YMAX - 2*MAZESTART) / 2 + 6, 2, 8);
-	
-	*/
 	
 	
 	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
@@ -275,11 +191,13 @@ int main(void)
 	}
 	
 	init_timer(1, TimeCounter_Time);
+	//init_timer(2, TextRedraw_Time);
 	
 	reset_RIT();
 	enable_RIT();
 	enable_timer(0);
 	enable_timer(1);
+	//enable_timer(2);
 	
 	
 	
