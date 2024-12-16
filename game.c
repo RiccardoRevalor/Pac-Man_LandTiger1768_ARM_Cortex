@@ -599,6 +599,79 @@ void showGameOver(){
 }
 
 
+void newGameRoutine() {
+	LCD_Clear(BACKGROUND_COLOR);
+	GUI_Text(getPixelX(SCORE_X), getPixelY(SCORE_Y), (uint8_t *) "SCORE:", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(SCORE_X+10), getPixelY(SCORE_Y), (uint8_t *) "0000", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(LIFECNT_X), getPixelY(LIFECNT_Y), (uint8_t *) "Lives:", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(LIFECNT_X+10), getPixelY(LIFECNT_Y), (uint8_t *) "1", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "Time:", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(TIMECNT_X+8), getPixelY(TIMECNT_Y), (uint8_t *) "60", White, BACKGROUND_COLOR);
+	
+	
+	drawMapWalls();
+	
+	
+	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
+	drawPlayer(plX , plY, RIGHT_DIR, 0);
+	
+	//debug
+	//drawBlank(plX, plY);
+	
+	//SET DIR AS IDLE (DON'T MOVE UNLESS THE USERS TOUCHES THE JOYSTICK)
+	playerDir = IDLE_DIR;
+	
+	
+	//left tunnel
+	drawTunnel(RT_X, T_Y, T_WIDTH, T_HEIGTH);
+	//right tunnel
+	drawTunnel(LT_X, T_Y, T_WIDTH, T_HEIGTH);
+	
+	//PILLS MANAGEMENT
+	placePills4();
+	
+	//drawBlanks();
+	
+	
+	//START GAME TIMERS
+	
+	disable_RIT();
+	reset_RIT();
+	init_RIT(RIT_Time);
+	enable_RIT();
+	
+	//START TIMER0 TO UPDATE GAME (60 FPS)
+	if (DEBUG_MOVS == 1) {
+		init_timer(0, FPS_Time_DEBUG);
+	} else {
+		init_timer(0, FPS_Time);
+	}
+	
+	init_timer(1, TimeCounter_Time);
+	//init_timer(2, TextRedraw_Time);
+	
+	//playerDir = RIGHT_DIR;
+	reset_timer(0);
+	reset_timer(1);
+	enable_timer(0);
+	enable_timer(1);
+	
+	
+}
+
+
+void showPause(uint8_t canResume) {
+	LCD_Clear(BACKGROUND_COLOR);
+	GUI_Text(getPixelX(XMAX / 2 - 10), getPixelY(YMAX / 2 -1), (uint8_t *) "Game Paused", Blue, BACKGROUND_COLOR);
+	if (canResume == 0) {
+		GUI_Text(getPixelX(0), getPixelY(YMAX / 2 +3), (uint8_t *) "Press INT0 to start a new game", Blue, BACKGROUND_COLOR);
+	} else {
+		
+		
+	}
+}
+
+
 
 	
 	

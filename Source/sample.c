@@ -126,6 +126,9 @@ uint16_t gameTime = GAMETIME_LIMIT;
 uint8_t pwrPills[PWR_PILLS][2] = {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}};
 uint8_t pwrPillsCounter = 0;
 
+uint8_t isPaused = 1; //1 = pause, 0 = game running
+uint8_t firstGame = 1; //1 -> it needs to start a new game, 0 -> it needs to resume the existing game
+
 int main(void)
 {
   SystemInit();  												/* System Initialization (i.e., PLL)  */
@@ -137,69 +140,19 @@ int main(void)
 	//initialize button EINT0
 	BUTTON_init();
 	
-	
-	//TO DO: POTENZIOMETRO COME SEED DEL RAND()
-	
-  //TP_Init();
-	//TouchPanel_Calibrate();
-	
-	LCD_Clear(BACKGROUND_COLOR);
-	GUI_Text(getPixelX(SCORE_X), getPixelY(SCORE_Y), (uint8_t *) "SCORE:", White, BACKGROUND_COLOR);
-	GUI_Text(getPixelX(SCORE_X+10), getPixelY(SCORE_Y), (uint8_t *) "0000", White, BACKGROUND_COLOR);
-	GUI_Text(getPixelX(LIFECNT_X), getPixelY(LIFECNT_Y), (uint8_t *) "Lives:", White, BACKGROUND_COLOR);
-	GUI_Text(getPixelX(LIFECNT_X+10), getPixelY(LIFECNT_Y), (uint8_t *) "1", White, BACKGROUND_COLOR);
-	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "Time:", White, BACKGROUND_COLOR);
-	GUI_Text(getPixelX(TIMECNT_X+8), getPixelY(TIMECNT_Y), (uint8_t *) "60", White, BACKGROUND_COLOR);
-	
-	
-	drawMapWalls();
-	
-	
-	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
-	drawPlayer(plX , plY, RIGHT_DIR, 0);
-	
-	//debug
-	//drawBlank(plX, plY);
-	
-	//SET DIR AS IDLE (DON'T MOVE UNLESS THE USERS TOUCHES THE JOYSTICK)
-	playerDir = IDLE_DIR;
-	
-	//PILLS MANAGEMENT DA FARE ALLA FINE
-	placePills4();
-	//drawPills4();
-	
-	
-	//left tunnel
-	drawTunnel(RT_X, T_Y, T_WIDTH, T_HEIGTH);
-	//right tunnel
-	drawTunnel(LT_X, T_Y, T_WIDTH, T_HEIGTH);
-	
-	//drawBlanks();
-	
-	
 	//ENABLE JOYSTICK
 	joystick_init();
 	
-	//START GAME TIMERS
 	
-	//START RIT FOR POLLING THE JOYSTICK
+	//START RIT FOR POLLING THE JOYSTICK AND DEBOUNCING INT0
 	init_RIT(RIT_Time);
 	
-	//START TIMER0 TO UPDATE GAME (60 FPS)
-	if (DEBUG_MOVS == 1) {
-		init_timer(0, FPS_Time_DEBUG);
-	} else {
-		init_timer(0, FPS_Time);
-	}
-	
-	init_timer(1, TimeCounter_Time);
-	//init_timer(2, TextRedraw_Time);
+	//initial state: set the game into a paused state, wait for INT0
+	showPause(0);
+
 	
 	reset_RIT();
 	enable_RIT();
-	enable_timer(0);
-	enable_timer(1);
-	//enable_timer(2);
 	
 	
 	

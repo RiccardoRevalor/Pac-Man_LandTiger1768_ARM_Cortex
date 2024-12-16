@@ -101,7 +101,7 @@ ho la timescale: Tempo base = 1 ms reale -> 0.00001024 s emulatore
 #define TimeCounter_Time 0x3E800 //0x17D7840
 //60 seconds time variable
 extern uint16_t gameTime; //at first it's equal to 0 (defined in sample.c)
-#define GAMETIME_LIMIT 600 //after that, the current game ends
+#define GAMETIME_LIMIT 60 //after that, the current game ends
 
 
 
@@ -225,6 +225,10 @@ extern uint8_t pwrPillsCounter;
 extern uint16_t score;
 extern uint16_t life;
 
+//GAME STATE
+extern uint8_t isPaused;
+extern uint8_t firstGame;
+
 //GUI TEXTS
 //SCORE POSITION
 #define SCORE_X XMAX - 17
@@ -244,7 +248,7 @@ extern uint16_t life;
 #define DEBUG_MOVS 0
 
 
-#define LTHRES 100 //points multiple threshold to add new life 
+#define LTHRES 1000 //points multiple threshold to add new life 
 //GFX
 void placePills4();
 void drawPills4(uint16_t cellX, uint16_t cellY, uint8_t isPowerPill);
@@ -262,6 +266,8 @@ void drawPlayerByPixels(uint16_t pixelX, uint16_t pixelY, uint8_t direction);
 void erasePlayer(uint16_t cellX, uint16_t cellY);
 void erasePill(uint16_t cellX, uint16_t cellY);
 void showGameOver();
+void newGameRoutine();
+void showPause(uint8_t canResume);
 
 static uint8_t gameOverGfxMap[YMAX][XMAX] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
