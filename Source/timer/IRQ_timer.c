@@ -29,8 +29,10 @@ extern uint16_t life;
 extern uint16_t gameTime;
 char scoreS[5];
 char gameTimeS[3];
+char lifeS[2];
 static uint8_t scoreNeedsRedraw = 0;
 static uint8_t lifeNeedsRedraw = 0;
+static uint16_t lastLifeIncrementGameTime = 0;
 
 void updateScoreString(){
 	if (scoreNeedsRedraw == 1){
@@ -49,11 +51,16 @@ void updateGameTimeString(){
 	
 }
 
+void updateLifeString(){
+	sprintf(lifeS, "%d", life);
+	GUI_Text(getPixelX(LIFECNT_X+10), getPixelY(LIFECNT_Y), (uint8_t *) lifeS, White, BACKGROUND_COLOR);
+}
+
 
 
 void TIMER0_IRQHandler (void)
 {
-	
+	//NVIC_DisableIRQ(TIMER0_IRQn);
 	static uint8_t lastDir = RIGHT_DIR;
 	static uint8_t isIdle = 0;
 	char buf[100];
@@ -77,7 +84,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=10;
 						scoreNeedsRedraw=1;
-						//updateScoreString();
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
             erasePlayer(plX, plY);
 						erasePill(lookAheadX, plY);
@@ -91,7 +98,7 @@ void TIMER0_IRQHandler (void)
 					//Score update
 					score+=10;
 					scoreNeedsRedraw=1;
-				
+					if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 					//2 cases: upper lookahead block contains STDPILL_CODE_2 or lower lookahead block contains STDPILL_CODE_2
 					if (maze[plY][lookAheadX] == STDPILL_CODE_1 || maze[plY][lookAheadX] == STDPILL_CODE_2) {
@@ -113,7 +120,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=50;
 						scoreNeedsRedraw=1;
-						//updateScoreString();
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
             erasePlayer(plX, plY);
 						erasePill(lookAheadX, plY);
@@ -127,7 +134,7 @@ void TIMER0_IRQHandler (void)
 					//Score update
 					score+=50;
 					scoreNeedsRedraw=1;
-				
+					if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 					//2 cases: upper lookahead block contains STDPILL_CODE_2 or lower lookahead block contains STDPILL_CODE_2
 					if (maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) {
@@ -183,6 +190,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=10;
 						scoreNeedsRedraw=1;
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
             erasePlayer(plX, plY);
 						erasePill(nextX-1, plY);
@@ -194,7 +202,7 @@ void TIMER0_IRQHandler (void)
 					//Score update
 					score+=10;
 					scoreNeedsRedraw=1;
-				
+					if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 					if (maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) {
 						//find the leftmost upper cell of the pill and erase the whole pill
@@ -214,6 +222,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=50;
 						scoreNeedsRedraw=1;
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
             erasePlayer(plX, plY);
 						erasePill(nextX-1, plY);
@@ -225,7 +234,7 @@ void TIMER0_IRQHandler (void)
 					//Score update
 					score+=50;
 					scoreNeedsRedraw=1;
-				
+					if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 					if (maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) {
 						//find the leftmost upper cell of the pill and erase the whole pill
@@ -272,7 +281,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=10;
 						scoreNeedsRedraw=1;
-				
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 						erasePlayer(plX, plY);
 						erasePill(plX, nextY-1);
@@ -285,6 +294,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=10;
 						scoreNeedsRedraw=1;
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 						if (maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2){
 							erasePill(plX-1, nextY-1);
@@ -300,7 +310,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=50;
 						scoreNeedsRedraw=1;
-				
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 						erasePlayer(plX, plY);
 						erasePill(plX, nextY-1);
@@ -313,6 +323,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=50;
 						scoreNeedsRedraw=1;
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 						if (maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2){
 							erasePill(plX-1, nextY-1);
@@ -352,7 +363,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=10;
 						scoreNeedsRedraw=1;
-				
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 						erasePlayer(plX, plY);
 						erasePill(plX, lookAheadY);
@@ -364,6 +375,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=10;
 						scoreNeedsRedraw=1;
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 				
 						if (maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) {
@@ -380,7 +392,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=50;
 						scoreNeedsRedraw=1;
-				
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 						erasePlayer(plX, plY);
 						erasePill(plX, lookAheadY);
@@ -392,7 +404,7 @@ void TIMER0_IRQHandler (void)
 						//Score update
 						score+=50;
 						scoreNeedsRedraw=1;
-				
+						if (score >= LTHRES && (score % LTHRES == 0)) lifeNeedsRedraw=0; else lifeNeedsRedraw=1;
 				
 						if (maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) {
 							erasePill(plX-1, lookAheadY);
@@ -421,6 +433,7 @@ void TIMER0_IRQHandler (void)
 		
 		case IDLE_DIR: {
 			//in case the player stops, draw the animation of teh last dir (and not the playerEating sprite)
+			if (score >= LTHRES && (score % LTHRES == 0) && lifeNeedsRedraw == 0) lifeNeedsRedraw=1; //block adding new life if in idle because it was already added the iteration before
 			
 			if (isIdle == 0) {
 				erasePlayer(plX, plY);
@@ -429,6 +442,7 @@ void TIMER0_IRQHandler (void)
 				
 				if (scoreNeedsRedraw==1){
 					updateScoreString();
+					scoreNeedsRedraw=0;
 				}
 				
 			}
@@ -437,21 +451,23 @@ void TIMER0_IRQHandler (void)
 		lastDir = playerDir;
 }
 	
+	if (score >= LTHRES && (score % LTHRES == 0)) {
+    if (lifeNeedsRedraw == 0) {
+        // Incrementa la vita e imposta il flag
+        life = life + 1;
+				score += 10;
+        lifeNeedsRedraw = 1;
+        updateLifeString();
+    }
+} /*else {
+    // Resetta il flag quando il punteggio non è più un multiplo di 100
+    lifeNeedsRedraw = 0;
+}*/
 
-	/*
-	//Update GUI TEXT
-	//Write 'SCORE' string
-	//MAX achievable score: 236 * 10 + 6*50 = 2660 -> 4 digits
-	GUI_Text(getPixelX(SCORE_X), getPixelY(SCORE_Y), (uint8_t *) "SCORE:0000", White, BACKGROUND_COLOR);
-	//60 seconds time counter
-	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "60", White, BACKGROUND_COLOR);
-	//Lives
-	char lifeS[100];
-	sprintf(lifeS, "Lives: %d", life);
-	GUI_Text(getPixelX(LIFECNT_X), getPixelY(LIFECNT_Y), (uint8_t *) lifeS, White, BACKGROUND_COLOR);
-*/
+
 
   LPC_TIM0->IR = 1;			/* clear interrupt flag */
+//NVIC_EnableIRQ(TIMER0_IRQn);
   return;
 }
 
@@ -557,6 +573,7 @@ void TIMER1_IRQHandler (void)
 		
 		
 	}
+	
 	
   LPC_TIM1->IR = 1;			/* clear interrupt flag */
   return;

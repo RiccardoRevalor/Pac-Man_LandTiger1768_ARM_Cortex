@@ -101,7 +101,7 @@ ho la timescale: Tempo base = 1 ms reale -> 0.00001024 s emulatore
 #define TimeCounter_Time 0x3E800 //0x17D7840
 //60 seconds time variable
 extern uint16_t gameTime; //at first it's equal to 0 (defined in sample.c)
-#define GAMETIME_LIMIT 60 //after that, the current game ends
+#define GAMETIME_LIMIT 600 //after that, the current game ends
 
 
 
@@ -142,10 +142,11 @@ RIT -> priority 1
 TIMER0 -> priority 2
 TIMER1 (60 sec counter) -> priority 3
 */
+#define EINT0_Priority 0
 #define RIT_Priority 1
 #define TIM0_Priority 2
-#define TIM1_Priority 5
-#define TIM2_Priority 2
+#define TIM1_Priority 3
+#define TIM2_Priority 5
 
 
 /*
@@ -242,6 +243,8 @@ extern uint16_t life;
 */
 #define DEBUG_MOVS 0
 
+
+#define LTHRES 100 //points multiple threshold to add new life 
 //GFX
 void placePills4();
 void drawPills4(uint16_t cellX, uint16_t cellY, uint8_t isPowerPill);

@@ -24,10 +24,10 @@
 #include "LPC17xx.h"
 #include "GLCD/GLCD.h" 
 #include "TouchPanel/TouchPanel.h"
-#include "timer/timer.h" //TIMER 
-#include "../../game.h"  //GAME LIBRARY
-#include "../../RIT.h"   //RIT 
-
+#include "timer/timer.h" 		//TIMER 
+#include "../../game.h"  		//GAME LIBRARY
+#include "../../RIT.h"   		//RIT 
+#include "../../button.h" 	//BUTTON
 
 #ifdef SIMULATOR
 extern uint8_t ScaleFlag; // <- ScaleFlag needs to visible in order for the emulator to find the symbol (can be placed also inside system_LPC17xx.h but since it is RO, it needs more work)
@@ -121,7 +121,7 @@ uint16_t plX = XMAX / 2 - 1;
 uint16_t plY = YMAX / 2;
 uint16_t score = 0;
 uint16_t life = 1;
-uint16_t gameTime = 60;
+uint16_t gameTime = GAMETIME_LIMIT;
 
 uint8_t pwrPills[PWR_PILLS][2] = {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}};
 uint8_t pwrPillsCounter = 0;
@@ -134,6 +134,8 @@ int main(void)
 	
   LCD_Initialization();
 	
+	//initialize button EINT0
+	BUTTON_init();
 	
 	
 	//TO DO: POTENZIOMETRO COME SEED DEL RAND()

@@ -647,6 +647,21 @@
               <FileType>1</FileType>
               <FilePath>.\joystick.c</FilePath>
             </File>
+            <File>
+              <FileName>button.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\button.h</FilePath>
+            </File>
+            <File>
+              <FileName>IRQ_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\IRQ_button.c</FilePath>
+            </File>
+            <File>
+              <FileName>lib_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\lib_button.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1243,6 +1258,21 @@
               <FileName>joystick.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\joystick.c</FilePath>
+            </File>
+            <File>
+              <FileName>button.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\button.h</FilePath>
+            </File>
+            <File>
+              <FileName>IRQ_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\IRQ_button.c</FilePath>
+            </File>
+            <File>
+              <FileName>lib_button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\lib_button.c</FilePath>
             </File>
           </Files>
         </Group>
