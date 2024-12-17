@@ -14,6 +14,7 @@
 #include "../TouchPanel/TouchPanel.h"
 #include <stdio.h> /*for sprintf*/
 #include "../../game.h"
+#include <stdlib.h>
 
 /******************************************************************************
 ** Function name:		Timer0_IRQHandler
@@ -538,6 +539,7 @@ void TIMER1_IRQHandler (void)
 			}
 			
 			if (totalPills > 0) {
+				srand((plX+plY)*totalPills);
 				int targetPill = rand() % totalPills + 1; // Seleziona l'ennesima pillola
 				int currentPill = 0;
 
