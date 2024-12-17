@@ -98,7 +98,9 @@ ho la timescale: Tempo base = 1 ms reale -> 0.00001024 s emulatore
 
 
 */
-#define TimeCounter_Time 0x3E800 //0x17D7840
+//EMULATOR: 0x3E800
+//REAL BOARD: 1000 ms * 25 Mhz = 0x17D7840
+#define TimeCounter_Time 0x3E800
 //60 seconds time variable
 extern uint16_t gameTime; //at first it's equal to 0 (defined in sample.c)
 #define GAMETIME_LIMIT 60 //after that, the current game ends
@@ -117,6 +119,8 @@ Voglio 30 fps = 1 / 32 ms circa
 Tempo base = 1 ms reale -> 0.00001024 s emulatore
 Faccio 32 x 0.00001024 s x 25 Mhz = 8192 -> 0x2000
 */
+//EMULATOR: 0x2000
+//REAL BOARD: 32 * 10^-3 * 25 Mhz = 0x1312D0
 #define FPS_Time 0x2000
 #define FPS_Time_DEBUG 0xBEBC20
 
@@ -127,12 +131,16 @@ Faccio 32 x 0.00001024 s x 25 Mhz = 8192 -> 0x2000
 Metto il contatore dimezzato rispetto a quello del timer0 per privilegiare gli input
 16 x 0.00001024 x 25 Mhz = 4096 -> 0x1000
 */
+//EMULATOR: 0x1000
+//REAL BOARD: 16 ms * 25 MHz = 0x61A80
 #define RIT_Time 0x1000
 
 
 //Timer to redraw GUI Texts
 //3 ms
-#define TextRedraw_Time 0x2000 //0x124F8
+//EMULATOR: 0x2000
+//REAL BOARD: 0xC3500
+#define TextRedraw_Time 0x2000 //0xC3500 
 
 
 //GAME MECHANICS INTERRUPTS PRIORITIES
@@ -221,9 +229,10 @@ extern uint8_t pwrPillsCounter;
 #define T_HEIGTH 8
 #define T_WIDTH 1
 
-//SCORE, LIVE
+//SCORE, LIVE, REMAINING PILLS
 extern uint16_t score;
 extern uint16_t life;
+extern uint16_t remainingPills;
 
 //GAME STATE
 extern uint8_t isPaused;
@@ -268,6 +277,8 @@ void erasePill(uint16_t cellX, uint16_t cellY);
 void showGameOver();
 void newGameRoutine();
 void showPause(uint8_t canResume);
+void resumeGameRoutine();
+void showVictory();
 
 static uint8_t gameOverGfxMap[YMAX][XMAX] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},

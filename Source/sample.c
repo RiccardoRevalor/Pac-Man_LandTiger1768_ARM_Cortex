@@ -129,6 +129,9 @@ uint8_t pwrPillsCounter = 0;
 uint8_t isPaused = 1; //1 = pause, 0 = game running
 uint8_t firstGame = 1; //1 -> it needs to start a new game, 0 -> it needs to resume the existing game
 
+uint16_t remainingPills = STD_PILLS; //count remaining pills to victory!
+
+
 int main(void)
 {
   SystemInit();  												/* System Initialization (i.e., PLL)  */

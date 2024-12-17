@@ -34,16 +34,12 @@ void RIT_IRQHandler(void) {
 		if((LPC_GPIO2->FIOPIN & (1<<10)) == 0){	//EINT0 PRESSED
 			EINT0_down++;
 		} else {
-			//button released
-			EINT0_down = 0; //reset counter
 			//enable interrupt mode again for EINT0 button
 			//LCD_Clear(Blue);
 			
 			//CASES
 			//1) game paused and firstGame == 1 -> start a new game
 			//2) game paused and firstGame == 0 -> resume existing game
-			NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
-			LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
 			
 			if (firstGame == 1) {
 				//start a new game from the beginning
@@ -52,7 +48,41 @@ void RIT_IRQHandler(void) {
 				isPaused = 0;
 				firstGame = 0;
 				newGameRoutine();
+				NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
+				LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
+				EINT0_down = 0;
+			} else {
+				//an existing game has been already running
+				if (isPaused == 0) {
+					//put the existing game in pause state
+					//set isPaused to 1
+					isPaused = 1;
+					showPause(1);					
+					NVIC_EnableIRQ(EINT0_IRQn);							 
+					LPC_PINCON->PINSEL4  |= (1 << 20);     
+					EINT0_down = 0;
+				} else {
+					//un-pause the game, so resume it
+					//se isPaused to 0
+					isPaused = 0;
+					LCD_Clear(BACKGROUND_COLOR);
+					resumeGameRoutine();
+					NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
+					LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
+					EINT0_down = 0;
+				}
 			}
+			
+			
+			
+			
+			//Reactivate EINT0 ONLY at the END!!
+			NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
+			LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
+			
+			
+			//button released
+			EINT0_down = 0; //reset counter
 			
 		}
 	} /*else {

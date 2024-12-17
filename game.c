@@ -568,6 +568,8 @@ void erasePill(uint16_t cellX, uint16_t cellY){
 				cntY = 0;
 				++cntX;
 	}
+	
+	remainingPills--; //UPDATE REMAINING PILLS
 }
 
 
@@ -595,10 +597,12 @@ void showGameOver(){
 				++cntX;
 	}
 	GUI_Text(getPixelX(XMAX / 2 - 7), getPixelY(2), (uint8_t *) "GAME OVER!", Red, BACKGROUND_COLOR);
+	reset_RIT();
+
 	
 }
 
-
+extern uint8_t EINT0_down;
 void newGameRoutine() {
 	LCD_Clear(BACKGROUND_COLOR);
 	GUI_Text(getPixelX(SCORE_X), getPixelY(SCORE_Y), (uint8_t *) "SCORE:", White, BACKGROUND_COLOR);
@@ -608,6 +612,14 @@ void newGameRoutine() {
 	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "Time:", White, BACKGROUND_COLOR);
 	GUI_Text(getPixelX(TIMECNT_X+8), getPixelY(TIMECNT_Y), (uint8_t *) "60", White, BACKGROUND_COLOR);
 	
+	//set score to 0, life to 1, power pills counter to 0
+	score = 0;
+	life = 1;
+	pwrPillsCounter = 0;
+	
+	//set default player position
+	plX = XMAX / 2 - 1;
+	plY = YMAX / 2;
 	
 	drawMapWalls();
 	
@@ -635,10 +647,13 @@ void newGameRoutine() {
 	
 	//START GAME TIMERS
 	
+	/*
 	disable_RIT();
 	reset_RIT();
 	init_RIT(RIT_Time);
 	enable_RIT();
+	*/
+	reset_RIT();
 	
 	//START TIMER0 TO UPDATE GAME (60 FPS)
 	if (DEBUG_MOVS == 1) {
@@ -651,25 +666,162 @@ void newGameRoutine() {
 	//init_timer(2, TextRedraw_Time);
 	
 	//playerDir = RIGHT_DIR;
+	disable_timer(0);
+	disable_timer(1);
 	reset_timer(0);
 	reset_timer(1);
 	enable_timer(0);
 	enable_timer(1);
 	
+	NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
+	LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
+	EINT0_down = 0;
+	
+	reset_RIT();
+}
+
+uint32_t TIM0Val, TIM1Val;
+uint8_t lastDir; 
+uint16_t lastPlX, lastPlY;
+uint8_t lastAnimation;
+extern uint16_t lastScore;
+extern uint16_t lastLife;
+
+void redrawPills4(){
+	//iterate trhough maze and redraw the remaining stdpills/pwrpills
+	int x,y;
+	for (y = MAZESTART; y < YMAX - MAZESTART; y++){
+		for (x = 0; x < XMAX; x++) {
+			if (maze[y][x] == STDPILL_CODE_1){
+				//redraw the stdpill
+				drawPills4(x,y,0);
+			} 
+			
+			if (maze[y][x] == PWRPILL_CODE_1) {
+				//redraw the pwrpill
+				drawPills4(x,y,1);
+				
+				
+			}
+			
+		}
+	}
 	
 }
 
+extern char scoreS[5];
+extern char gameTimeS[3];
+extern char lifeS[2];
+
+
+void resumeGameRoutine() {
+	LCD_Clear(BACKGROUND_COLOR);
+	
+	
+	GUI_Text(getPixelX(SCORE_X), getPixelY(SCORE_Y), (uint8_t *) "SSCORE:", White, BACKGROUND_COLOR);
+	sprintf(scoreS, "%04d", score);
+	GUI_Text(getPixelX(SCORE_X+10), getPixelY(SCORE_Y), (uint8_t *) scoreS, White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(LIFECNT_X), getPixelY(LIFECNT_Y), (uint8_t *) "Lives:", White, BACKGROUND_COLOR);
+	sprintf(lifeS, "%d", life);
+	GUI_Text(getPixelX(LIFECNT_X+10), getPixelY(LIFECNT_Y), (uint8_t *) lifeS, White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "Time:", White, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(TIMECNT_X+8), getPixelY(TIMECNT_Y), (uint8_t *) "  ", White, BACKGROUND_COLOR);
+	
+	drawMapWalls();
+	
+	
+	//DRAW PLAYER AT START POSITION (AT THE CENTER, DOWN AFTER THE HOUSE)
+	drawPlayer(lastPlX , lastPlY, lastDir, lastAnimation);
+	
+	//debug
+	//drawBlank(plX, plY);
+	
+	//SET DIR AS IDLE (DON'T MOVE UNLESS THE USERS TOUCHES THE JOYSTICK)
+	playerDir = lastDir;
+	
+	
+	//left tunnel
+	drawTunnel(RT_X, T_Y, T_WIDTH, T_HEIGTH);
+	//right tunnel
+	drawTunnel(LT_X, T_Y, T_WIDTH, T_HEIGTH);
+	
+	//PILLS MANAGEMENT
+	//Now I have to redraw the remaining (= not eaten) pills, not generate new ones
+	redrawPills4();
+	
+	//drawBlanks();
+	
+	
+	//START GAME TIMERS
+	
+	/*
+	disable_RIT();
+	reset_RIT();
+	init_RIT(RIT_Time);
+	enable_RIT();
+	*/
+	
+	//START TIMER0 TO UPDATE GAME
+	/*
+	init_timer(0, TIM0Val);
+	
+	init_timer(1, TIM1Val);
+	//init_timer(1, TextRedraw_Time);
+	
+	//playerDir = RIGHT_DIR;
+	reset_timer(0);
+	reset_timer(1);
+	enable_timer(0);
+	enable_timer(1);
+	*/
+	
+	NVIC_EnableIRQ(EINT0_IRQn);							 
+	LPC_PINCON->PINSEL4  |= (1 << 20);     
+	EINT0_down = 0;
+	reset_RIT();
+	
+	
+	
+}
 
 void showPause(uint8_t canResume) {
-	LCD_Clear(BACKGROUND_COLOR);
-	GUI_Text(getPixelX(XMAX / 2 - 10), getPixelY(YMAX / 2 -1), (uint8_t *) "Game Paused", Blue, BACKGROUND_COLOR);
 	if (canResume == 0) {
+		LCD_Clear(BACKGROUND_COLOR);
+		GUI_Text(getPixelX(XMAX / 2 - 10), getPixelY(YMAX / 2 -1), (uint8_t *) "Game Paused", Blue, BACKGROUND_COLOR);
 		GUI_Text(getPixelX(0), getPixelY(YMAX / 2 +3), (uint8_t *) "Press INT0 to start a new game", Blue, BACKGROUND_COLOR);
-	} else {
 		
-		
+	} else {		
+		LCD_Clear(BACKGROUND_COLOR);
+		GUI_Text(getPixelX(XMAX / 2 - 10), getPixelY(YMAX / 2 -1), (uint8_t *) "Game Paused", Blue, BACKGROUND_COLOR);
+		GUI_Text(getPixelX(5), getPixelY(YMAX / 2 +3), (uint8_t *) "Press INT0 to resume", Blue, BACKGROUND_COLOR);
+		//pause game timers
+		//save all the game variables!
+		TIM0Val = LPC_TIM0->TC;
+		TIM1Val = LPC_TIM1->TC;
+		lastDir = playerDir;
+		lastPlX = plX;
+		lastPlY = plY;
+		if (lastDir == IDLE_DIR) lastAnimation = 0; else lastAnimation = 1;
+		/*
+		disable_timer(0);
+		disable_timer(1);
+		*/
+		reset_RIT();
+		NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
+		LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
+		EINT0_down = 0;
+		reset_RIT();
 	}
 }
+
+void showVictory() {
+	LCD_Clear(Green);
+	GUI_Text(getPixelX(XMAX / 2 - 7), getPixelY(YMAX / 2 -1), (uint8_t *) "Victory!", Blue, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(0), getPixelY(YMAX / 2 +3), (uint8_t *) "Press INT0 to start a new game", Blue, BACKGROUND_COLOR);
+	reset_RIT();
+
+}
+
 
 
 

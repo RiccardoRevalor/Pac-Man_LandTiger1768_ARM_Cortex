@@ -65,6 +65,11 @@ void TIMER0_IRQHandler (void)
 	static uint8_t isIdle = 0;
 	char buf[100];
 	
+	if (isPaused == 1) {
+		LPC_TIM0->IR = 1;			/* clear interrupt flag */
+		return;
+	}
+	
 	switch (playerDir) {
     case RIGHT_DIR: {
 				isIdle = 0;
@@ -465,9 +470,21 @@ void TIMER0_IRQHandler (void)
 }*/
 
 
+	//CHECK REMAINING PILLS NUMBER TO DECLARE VICTORY
+	if (remainingPills <= 0) {
+		showVictory();
+		//end of game: set isPaused to 1, set firstGame to 1
+		isPaused = 1;
+		firstGame = 1;
+		remainingPills = STD_PILLS; //reset counter for remaining pills for the new game
+		
+		//reset the player, erasing its sprite from the maze
+		erasePlayer(plX, plY);
+	}
+
 
   LPC_TIM0->IR = 1;			/* clear interrupt flag */
-//NVIC_EnableIRQ(TIMER0_IRQn);
+	//NVIC_EnableIRQ(TIMER0_IRQn);
   return;
 }
 
@@ -484,7 +501,10 @@ void TIMER0_IRQHandler (void)
 void TIMER1_IRQHandler (void)
 {
 	
-
+	if (isPaused == 1) {
+		LPC_TIM1->IR = 1;			/* clear interrupt flag */
+		return;
+	}
 	/*
 	
 	TIMER 1
@@ -546,7 +566,14 @@ void TIMER1_IRQHandler (void)
 				
 			} else {
 				//VICTORY!
-				LCD_Clear(Green);
+				showVictory();
+				//end of game: set isPaused to 1, set firstGame to 1
+				isPaused = 1;
+				firstGame = 1;
+				remainingPills = STD_PILLS; //reset counter for remaining pills for the new game
+				
+				//reset the player, erasing its sprite from the maze
+				erasePlayer(plX, plY);
 				
 			}
 		}
@@ -559,16 +586,23 @@ void TIMER1_IRQHandler (void)
 	
 	if (gameTime <= 0) {
 		
+		
 		//RESET AND DISABLE ALL THE OTHERS TIMER
-		reset_timer(0);
-		disable_timer(0);
+		//reset_timer(0);
+		//disable_timer(0);
+		
+		//end of game: set isPaused to 1, set firstGame to 1
+		isPaused = 1;
+		firstGame = 1;
+		remainingPills = STD_PILLS; //reset counter for remaining pills for the new game
+		erasePlayer(plX, plY);
 		
 		showGameOver();
 		
 		//at last, disable itself
-		reset_timer(1);
-		disable_timer(1);
-		LPC_TIM1->IR = 1;			/* clear interrupt flag */
+		//reset_timer(1);
+		//disable_timer(1);
+		LPC_TIM1->IR = 1;
 		return;
 		
 		
