@@ -76,13 +76,16 @@ void placePills(){
 		 for (y = 0; y < YMAX - 1 && standardPills > 0; y+=2) {
 					for (x = 0; x < XMAX - 1 && standardPills > 0; x+=2) {
 						
-						//if (maze[y][x] != 0) continue;
+						//If (y,x) is in the ghosts house -> don't spawn pills in there!
+						
+						if ((y == 28 || y == 29 || y == 30) && (x >= 20 && x <= 27)) continue; //ghosts house coordinates
+						
+
 						if (maze[y][x] != FREE_CODE || maze[y][x + 1] != FREE_CODE || maze[y + 1][x] != FREE_CODE || maze[y + 1][x + 1] != FREE_CODE) continue;
 						//if (!isAreaFree(y,x,1)) continue;
 						float probCell = (float)rand()/(float)(RAND_MAX);
 						
 						if (probCell < prob / 2){
-							//maze[y][x] = 2; //put a new std pill here
 							maze[y][x] = STDPILL_CODE_1;       // Top-left
               maze[y][x + 1] = STDPILL_CODE_2;   // Top-right
               maze[y + 1][x] = STDPILL_CODE_2;   // Bottom-left
@@ -92,13 +95,6 @@ void placePills(){
 							standardPills --;
 						}
 						
-						
-						/* before: fill everything algorithm
-							if (maze[y][x] == 0 && standardPills > 0) {
-									maze[y][x] = 2; // Pillola standard
-									standardPills--;
-							}
-						*/
 					}
 			}
 		}
@@ -133,6 +129,13 @@ void placePills4(){
 		 for (y = MAZESTART; y <= YMAX - MAZESTART - 1 && standardPills > 0; y++) {
 					for (x = 1; x <= XMAX - 1 && standardPills > 0; x++) {
 						
+						//If (y,x) is in the ghosts house -> don't spawn pills in there!					
+						if ((y == 28 || y == 29 || y == 30) && (x >= 20 && x <= 27)) continue; //ghosts house coordinates
+						
+						//if x == 1 || x == XMAX-1 and y = tunnels y -> don't put pills at the entrance of tunnels
+						if ((x == 1 || x == XMAX-1 || x == 2 || x == XMAX -2 || x == XMAX -3) && (y >= T_Y && y < T_Y + T_HEIGTH)) continue;
+						
+						
 						//if (maze[y][x] != 0) continue; //|| maze[y + 2][x + 1] != 0 || maze[y + 1][x + 2] || maze[y][x+2] != FREE_CODE
 						//prima c'era: maze[y][x-1] != FREE_CODE
 						if (maze[y][x] != FREE_CODE || maze[y][x + 1] != FREE_CODE || maze[y + 1][x] != FREE_CODE || maze[y + 1][x + 1] != FREE_CODE ) continue;
@@ -145,28 +148,13 @@ void placePills4(){
             maze[y + 1][x] = STDPILL_CODE_2;   // Bottom-left
             maze[y + 1][x + 1] = STDPILL_CODE_2; // Bottom-right
 						
-						//save also the newly added pill in the stdpill matrix
-						//pillsCells[y][x] = STDPILL_CODE_1;
 						
 						drawPills4(x, y, 0);
 						
 						standardPills --;
 					}
 			}
-}
-		
-		/*
-		PWR PILLS
-    while (powerPills > 0) {
-        int x = rand() % XMAX;
-        int y = rand() % YMAX;
-
-        if (maze[y][x] == FREE_CODE) { // Sostituisci pillola standard con power pill
-            maze[y][x] = STDPILL_CODE_1; //PWRPILL_CODE_1;
-            powerPills--;
-        }
-    }
-		*/
+	}
 }
 
 void drawPills(){
@@ -583,6 +571,7 @@ void showGameOver(){
 		
 		
 		
+	/*
 	uint16_t x, y;
 	uint16_t cntX = 0, cntY = 0;
 	uint16_t xplayer = getPixelX(0), yplayer = getPixelY(MAZESTART + 10);
@@ -596,12 +585,55 @@ void showGameOver(){
 				cntY = 0;
 				++cntX;
 	}
+	*/
+	int y;
+	int x;
+	for (y = 0; y < YMAX; y++){
+		for (x = 0; x < XMAX; x++){
+			
+			int cellValue = gameOverGfxMap[y][x];
+			
+			if (cellValue == WALL_CODE){
+				//wall detected
+				//translate fake cell coordinates into the real ones
+				//each cell is 16x15 pixels
+				uint16_t x0 = x * CELL_W;
+        uint16_t y0 = y * CELL_H;
+        uint16_t x1 = x0 + CELL_W - 1;
+        uint16_t y1 = y0 + CELL_H - 1;
+				
+				// Disegna il rettangolo per rappresentare il muro
+        LCD_DrawLine(x0, y0, x1, y0, White); // Linea superiore
+        LCD_DrawLine(x0, y0, x0, y1, White); // Linea sinistra
+        LCD_DrawLine(x1, y0, x1, y1, White); // Linea destra
+        LCD_DrawLine(x0, y1, x1, y1, White); // Linea inferiore
+
+			}
+			
+		}
+	}
 	GUI_Text(getPixelX(XMAX / 2 - 7), getPixelY(2), (uint8_t *) "GAME OVER!", Red, BACKGROUND_COLOR);
+	GUI_Text(getPixelX(0), getPixelY(5), (uint8_t *) "Press INT0 to start a new game", Red, BACKGROUND_COLOR);
 	reset_RIT();
 
 	
 }
 
+void deleteRemainingPills(){
+	int x, y;
+	for (y = MAZESTART; y < YMAX - MAZESTART; y++){
+		for (x = 0; x < XMAX; x++) {
+			if (maze[y][x] == STDPILL_CODE_1 || maze[y][x] == PWRPILL_CODE_1) {
+				//upper left cell of a stdpill/pwrpill -> delete the whole pill from the maze
+				maze[y][x] = FREE_CODE;
+				maze[y+1][x] = FREE_CODE;
+				maze[y][x+1] = FREE_CODE;
+				maze[y+1][x+1] = FREE_CODE;
+			}
+		}
+	}
+	
+}
 extern uint8_t EINT0_down;
 void newGameRoutine() {
 	LCD_Clear(BACKGROUND_COLOR);
@@ -612,10 +644,11 @@ void newGameRoutine() {
 	GUI_Text(getPixelX(TIMECNT_X), getPixelY(TIMECNT_Y), (uint8_t *) "Time:", White, BACKGROUND_COLOR);
 	GUI_Text(getPixelX(TIMECNT_X+8), getPixelY(TIMECNT_Y), (uint8_t *) "60", White, BACKGROUND_COLOR);
 	
-	//set score to 0, life to 1, power pills counter to 0
+	//set score to 0, life to 1, power pills counter to 0, gameTime to GAMETIME_LIMIT
 	score = 0;
 	life = 1;
 	pwrPillsCounter = 0;
+	gameTime = GAMETIME_LIMIT;
 	
 	//set default player position
 	plX = XMAX / 2 - 1;
@@ -654,6 +687,12 @@ void newGameRoutine() {
 	enable_RIT();
 	*/
 	reset_RIT();
+	
+	disable_timer(0);
+	disable_timer(1);
+	reset_timer(0);
+	reset_timer(1);
+	
 	
 	//START TIMER0 TO UPDATE GAME (60 FPS)
 	if (DEBUG_MOVS == 1) {

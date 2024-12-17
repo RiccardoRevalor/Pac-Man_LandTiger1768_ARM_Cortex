@@ -600,6 +600,7 @@ void TIMER1_IRQHandler (void)
 		erasePlayer(plX, plY);
 		
 		showGameOver();
+		deleteRemainingPills();
 		
 		//at last, disable itself
 		//reset_timer(1);
