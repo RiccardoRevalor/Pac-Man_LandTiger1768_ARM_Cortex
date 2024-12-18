@@ -133,10 +133,41 @@ uint8_t firstGame = 1; //1 -> it needs to start a new game, 0 -> it needs to res
 uint16_t remainingPills = STD_PILLS; //count remaining pills to victory!
 
 
+const int timMusicInterval = NoteFreq / 1000 * 25000000;
+uint8_t reproduceNotes = 0;
+uint8_t reproductionTime = 200;
+//EXTRA POINT 2
+//A Star Algorithm
+/*
+1) Each cell becomes a Node in the graph
+2) I calculate f and I put the nodes in the list from the smallest f to the biggest one
+3) Each time Blinky moves, it selects the node with the smallest f
+4) When pacman moves the target node moves as well
+	
+*/
+	
+//Ghost position cells
+uint8_t gX = BLINKY_START_X-1;
+uint8_t gY = BLINKY_STATRT_Y;
+
+
+/*
+uint8_t src[2] = {BLINKY_START_X, BLINKY_STATRT_Y}; //SRC = BLINKY POS
+uint8_t dest[2] = {XMAX / 2 - 1, YMAX / 2};	//DEST: PLAYER POS
+*/
+
 int main(void)
 {
   SystemInit();  												/* System Initialization (i.e., PLL)  */
 	
+	//ACTIVATE ADC
+	LPC_PINCON->PINSEL1 |= (1<<21);
+	LPC_PINCON->PINSEL1 &= ~(1<<20);
+	LPC_GPIO0->FIODIR |= (1<<26);
+	
+	//REPRODUCE MUSIC
+	init_timer(2, 300);
+	enable_timer(2);
 	
 	
   LCD_Initialization();

@@ -457,6 +457,55 @@ void TIMER0_IRQHandler (void)
 		lastDir = playerDir;
 }
 	
+	//EXTRAPOINTS2: MOVE BLINKY
+	//try every new cell in the four directions, is there's a wall reject it
+	//prioprity: UP, LEFT, DOWN, RIGHT
+
+	//TEST CELL UP:
+	uint8_t bestDir = UP_DIR;
+	int lowestDistance = 10000;
+	int d = 0;
+
+	if (goodCellForBlinky(gX, gY, UP_DIR) == 1) {
+		//UP IS (gX, gY-1)
+		//if yes, calculate manhattan and in case update the best dir and lowest distance
+		d = manhattanDistance(plX, plY, gX, gY-1);
+		if (d < lowestDistance) {
+			bestDir = UP_DIR;
+			lowestDistance = d;
+		}
+	}
+	if (goodCellForBlinky(gX, gY, LEFT_DIR) == 1) {
+		//LEFT IS (gX-1, gY)
+		//if yes, calculate manhattan and in case update the best dir and lowest distance
+		d = manhattanDistance(plX, plY, gX-1, gY);
+		if (d < lowestDistance) {
+			bestDir = LEFT_DIR;
+			lowestDistance = d;
+		}
+	}
+	if (goodCellForBlinky(gX, gY, DOWN_DIR) == 1) {
+		//DOWN IS (gX, gY+1)
+		//if yes, calculate manhattan and in case update the best dir and lowest distance
+		d = manhattanDistance(plX, plY, gX, gY+1);
+		if (d < lowestDistance) {
+			bestDir = DOWN_DIR;
+			lowestDistance = d;
+		}
+	}
+	if (goodCellForBlinky(gX, gY, RIGHT_DIR) == 1) {
+		//RIGHT IS (gX+1, gY)
+		//if yes, calculate manhattan and in case update the best dir and lowest distance
+		d = manhattanDistance(plX, plY, gX+1, gY);
+		if (d < lowestDistance) {
+			bestDir = RIGHT_DIR;
+			lowestDistance = d;
+		}
+	}
+	//At this Point I know the best direction for Blinky!
+	erasePlayer(gX, gY);
+	drawBlinky(gX, gY, bestDir, 0);
+	
 	if (score >= LTHRES && (score % LTHRES == 0)) {
     if (lifeNeedsRedraw == 0) {
         // Incrementa la vita e imposta il flag
@@ -616,14 +665,33 @@ void TIMER1_IRQHandler (void)
   return;
 }
 
+extern uint8_t reproduceNotes;
+extern uint8_t reproductionTime;
 void TIMER2_IRQHandler (void){
 	
-	if (scoreNeedsRedraw==1){
-		updateScoreString();
-		scoreNeedsRedraw=0;
-		
+	
+	static uint8_t sineticks = 0; // Indice per la tabella
+	
+	if (reproduceNotes > 0){
+		if (reproductionTime > 0) {
+    uint16_t currentValue;
+
+    // Ottieni il valore dalla tabella sinusoidale
+    currentValue = SinTable[sineticks];
+		currentValue = currentValue * 0.1;
+    LPC_DAC->DACR = currentValue << 6; // Scrivi il valore al DAC (sinistra 6 bit)
+
+    // Incrementa l'indice della tabella
+    sineticks++;
+    if (sineticks == 45) sineticks = 0; // Ritorna all'inizio della tabella
+		--reproductionTime;
+		} else {
+			reproduceNotes = 0;
+			reproductionTime = 200;
+		}
 	}
-	LPC_TIM2->IR = 1;			/* clear interrupt flag */
+	
+	LPC_TIM2->IR = 1; // Cancella il flag di interrupt
   return;
 }
 

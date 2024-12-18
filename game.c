@@ -533,7 +533,7 @@ void erasePlayer(uint16_t cellX, uint16_t cellY){
 	}
 }
 
-
+extern uint8_t reproduceNotes;
 void erasePill(uint16_t cellX, uint16_t cellY){
 	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
 	uint16_t x, y;
@@ -558,6 +558,9 @@ void erasePill(uint16_t cellX, uint16_t cellY){
 	}
 	
 	remainingPills--; //UPDATE REMAINING PILLS
+	
+	reproduceNotes = 1;
+	
 }
 
 
@@ -677,6 +680,8 @@ void newGameRoutine() {
 	
 	//drawBlanks();
 	
+	//draw blinky
+	drawBlinky(gX, gY, IDLE_DIR, 0);
 	
 	//START GAME TIMERS
 	
@@ -712,9 +717,11 @@ void newGameRoutine() {
 	enable_timer(0);
 	enable_timer(1);
 	
-	NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
-	LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
+	/*
+	NVIC_EnableIRQ(EINT0_IRQn);							 
+	LPC_PINCON->PINSEL4  |= (1 << 20);     
 	EINT0_down = 0;
+	*/
 	
 	reset_RIT();
 }
@@ -860,6 +867,181 @@ void showVictory() {
 	reset_RIT();
 
 }
+
+int manhattanDistance(uint8_t playerX, uint8_t playerY, uint8_t newGhostX, uint8_t newGhostY){
+	return abs(newGhostX-playerX)+abs(newGhostY-playerY);
+	
+}
+
+uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction){
+	//1 -> good cell
+	//0 -> bas cell, cannot choose this direction for Blinky!
+	
+	//(x,y) is the UPPER LEFTMOST CELL OF the 2x2 ghost
+	
+	if (x <= 0 || x >= XMAX - 1) return 0;
+	if (y <= MAZESTART || y >= YMAX - MAZESTART - 1) return 0;
+	
+	if (direction == RIGHT_DIR) {
+				int lookAheadX = plX + 2; 
+        int nextX = plX + 1; 
+        if (maze[plY][lookAheadX] == FREE_CODE && maze[plY+1][lookAheadX] == FREE_CODE) {
+            // Il giocatore può muoversiS
+            return 1;
+        } else if ((maze[plY][lookAheadX] == STDPILL_CODE_1 || maze[plY][lookAheadX] == STDPILL_CODE_2) && (maze[plY+1][lookAheadX] == STDPILL_CODE_1 || maze[plY+1][lookAheadX] == STDPILL_CODE_2)) {
+            return 1;
+			
+						
+        } else if (((maze[plY][lookAheadX] == STDPILL_CODE_1 || maze[plY][lookAheadX] == STDPILL_CODE_2) && maze[plY+1][lookAheadX] == FREE_CODE) || ((maze[plY+1][lookAheadX] == STDPILL_CODE_1 || maze[plY+1][lookAheadX] == STDPILL_CODE_2) && maze[plY][lookAheadX] == FREE_CODE)) {
+					return 1;
+				
+				} else if ((maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) && (maze[plY+1][lookAheadX] == PWRPILL_CODE_1 || maze[plY+1][lookAheadX] == PWRPILL_CODE_2)) {
+            return 1;
+			
+						
+        } else if (((maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) && maze[plY+1][lookAheadX] == FREE_CODE) || ((maze[plY+1][lookAheadX] == PWRPILL_CODE_1 || maze[plY+1][lookAheadX] == PWRPILL_CODE_2) && maze[plY][lookAheadX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
+					
+					return 1;
+				
+				}
+				return 0;
+  }
+	
+	if (direction == LEFT_DIR) {
+		int nextX = plX - 1;
+		if (maze[plY][nextX] == FREE_CODE && maze[plY+1][nextX] == FREE_CODE) {
+						//PURE CHUNK OF 2x2 FREE BLOCKS
+            return 1;	
+        } else if ((maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) && (maze[plY+1][nextX] == STDPILL_CODE_1 || maze[plY+1][nextX] == STDPILL_CODE_2)) {
+						//PURE CHUNK OF 2x2 STDPILL BLOCKS
+            return 1;
+        } else if (((maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) && maze[plY+1][nextX] == FREE_CODE) || ((maze[plY+1][nextX] == STDPILL_CODE_1 || maze[plY+1][nextX] == STDPILL_CODE_2) && maze[plY][nextX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
+				
+					return 1;
+				
+				} else if ((maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) && (maze[plY+1][nextX] == PWRPILL_CODE_1 || maze[plY+1][nextX] == PWRPILL_CODE_2)) {
+						//PURE CHUNK OF 2x2 PWRPILL BLOCKS
+            return 1;
+        } else if (((maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) && maze[plY+1][nextX] == FREE_CODE) || ((maze[plY+1][nextX] == PWRPILL_CODE_1 || maze[plY+1][nextX] == PWRPILL_CODE_2) && maze[plY][nextX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK				
+					return 1;				
+				}
+				return 0;		
+	}
+	
+	if (direction == UP_DIR) {
+		int nextY = plY - 1; // Spostamento in alto
+        if (maze[nextY][plX] == FREE_CODE && maze[nextY][plX+1] == FREE_CODE) {
+            return 1;
+        } else if ((maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) && (maze[nextY][plX+1] == STDPILL_CODE_1 || maze[nextY][plX+1] == STDPILL_CODE_2)) {
+            
+						return 1;
+        } else if (((maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) && maze[nextY][plX+1] == FREE_CODE) || ((maze[nextY][plX+1] == STDPILL_CODE_1 || maze[nextY][plX+1] == STDPILL_CODE_2) && maze[nextY][plX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
+						
+				
+						return 1;
+				
+				} else if ((maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2) && (maze[nextY][plX+1] == PWRPILL_CODE_1 || maze[nextY][plX+1] == PWRPILL_CODE_2)) {
+            return 1;
+        } else if (((maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2) && maze[nextY][plX+1] == FREE_CODE) || ((maze[nextY][plX+1] == PWRPILL_CODE_1 || maze[nextY][plX+1] == PWRPILL_CODE_2) && maze[nextY][plX] == FREE_CODE)) {
+					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
+						
+				
+						return 1;
+				}
+				return 0;
+	}
+	
+	if (direction == DOWN_DIR){
+		
+		int lookAheadY = plY + 2;
+        int nextY = plY + 1; // Spostamento in basso
+        if (maze[lookAheadY][plX] == FREE_CODE && maze[lookAheadY][plX+1] == FREE_CODE) {
+            return 1;
+        } else if ((maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) && (maze[lookAheadY][plX+1] == STDPILL_CODE_1 || maze[lookAheadY][plX+1] == STDPILL_CODE_2)) {
+            
+						return 1;
+        } else if (((maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) && maze[lookAheadY][plX+1] == FREE_CODE) || ((maze[lookAheadY][plX+1] == STDPILL_CODE_1 || maze[lookAheadY][plX+1] == STDPILL_CODE_2) && maze[lookAheadY][plX] == FREE_CODE)) {
+						//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
+						
+						return 1;
+				
+				} else if ((maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) && (maze[lookAheadY][plX+1] == PWRPILL_CODE_1 || maze[lookAheadY][plX+1] == PWRPILL_CODE_2)) {
+            //FULL PWR PILL
+						//Score update
+						return 1;
+        } else if (((maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) && maze[lookAheadY][plX+1] == FREE_CODE) || ((maze[lookAheadY][plX+1] == PWRPILL_CODE_1 || maze[lookAheadY][plX+1] == PWRPILL_CODE_2) && maze[lookAheadY][plX] == FREE_CODE)) {
+						//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
+						
+						return 1;
+			}
+			return 0;
+		
+	}
+	
+	
+	return 0;
+}
+void drawBlinky(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t animation){
+	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
+	uint16_t x, y;
+	uint16_t cntX = 0, cntY = 0;
+	uint16_t res = (cellY + cellX) % 2;
+	
+	
+	maze[cellY][cellX] = PLAYER_CODE;
+	maze[cellY+1][cellX] = PLAYER_CODE;
+	maze[cellY][cellX+1] = PLAYER_CODE;
+	maze[cellY+1][cellX+1] = PLAYER_CODE;
+	
+	
+
+			for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
+				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
+					if (res == 0 || animation == 0) {
+						if (Blinky[cntY][cntX] == 1) {
+							if (LCD_GetPoint(x, y ) != BLINKY_COLOR) LCD_SetPoint(x, y, BLINKY_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
+						} else {
+							if (LCD_GetPoint(x, y ) != BACKGROUND_COLOR) LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+						}
+					} else {
+						if (Blinky[cntY][cntX] == 1) {
+							if (LCD_GetPoint(x, y ) != BLINKY_COLOR) LCD_SetPoint(x, y, BLINKY_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
+						} else {
+							if (LCD_GetPoint(x, y ) != BACKGROUND_COLOR) LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+						}
+					}
+					cntY++;
+				}
+				cntY = 0;
+				++cntX;
+			}
+	} 
+
+void create_valid_nodes(Node nodes[], int* node_count) {
+		//put all the free cells or the cells hosting the stdpill/pwr pill as nodes in the graph
+    *node_count = 0;
+		uint8_t x,y;
+    for (y = 0; y < YMAX; y++) {
+        for (x = 0; x < XMAX; x++) {
+					if (maze[y][x] == FREE_CODE && maze[y][x+1] == FREE_CODE && maze[y+1][x] == FREE_CODE && maze[y+1][x+1] == FREE_CODE) {
+                Node node = { .x = x, .y = y, .g = 0, .h = 0, .f = 0, .parent = NULL };
+                nodes[*node_count] = node;
+                (*node_count)++;
+            }
+					if (maze[y][x] == STDPILL_CODE_1 && maze[y][x+1] == STDPILL_CODE_2 && maze[y+1][x] == STDPILL_CODE_2 && maze[y+1][x+1] == STDPILL_CODE_2) {
+                Node node = { .x = x, .y = y, .g = 0, .h = 0, .f = 0, .parent = NULL };
+                nodes[*node_count] = node;
+                (*node_count)++;
+            }
+					
+        }
+    }
+}
+
 
 
 

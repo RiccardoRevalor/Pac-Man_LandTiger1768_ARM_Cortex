@@ -45,12 +45,15 @@ void RIT_IRQHandler(void) {
 				//start a new game from the beginning
 				//set isPaused to 0
 				//set firstGame to 0
+				EINT0_down = 0;
 				isPaused = 0;
 				firstGame = 0;
 				newGameRoutine();
-				NVIC_EnableIRQ(EINT0_IRQn);							 /* enable Button interrupts			*/
-				LPC_PINCON->PINSEL4  |= (1 << 20);     /* External interrupt 0 pin selection */
+				/*
+				NVIC_EnableIRQ(EINT0_IRQn);							 
+				LPC_PINCON->PINSEL4  |= (1 << 20);     
 				EINT0_down = 0;
+				*/
 			} else {
 				//an existing game has been already running
 				if (isPaused == 0) {
@@ -72,7 +75,6 @@ void RIT_IRQHandler(void) {
 					EINT0_down = 0;
 				}
 			}
-			
 			
 			
 			

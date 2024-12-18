@@ -11,6 +11,7 @@
 #define PWRPILL_COLOR Green
 #define HOUSEDOOR_COLOR Red
 #define PLAYER_COLOR Yellow
+#define BLINKY_COLOR Red
 
 //position of maze start
 #define MAZESTART 5
@@ -100,7 +101,7 @@ ho la timescale: Tempo base = 1 ms reale -> 0.00001024 s emulatore
 */
 //EMULATOR: 0x3E800
 //REAL BOARD: 1000 ms * 25 Mhz = 0x17D7840
-#define TimeCounter_Time 0x3E800
+#define TimeCounter_Time 0x17D7840 //0x3E800
 //60 seconds time variable
 extern uint16_t gameTime; //at first it's equal to 0 (defined in sample.c)
 #define GAMETIME_LIMIT 60 //after that, the current game ends
@@ -121,7 +122,7 @@ Faccio 32 x 0.00001024 s x 25 Mhz = 8192 -> 0x2000
 */
 //EMULATOR: 0x2000 (30 FPS), or 0x1000 (60 FPS)
 //REAL BOARD: 32 * 10^-3 * 25 Mhz = 0x1312D0
-#define FPS_Time 0x1000 //0x2000
+#define FPS_Time 0x1312D0 //0x1000
 #define FPS_Time_DEBUG 0xBEBC20 //just to be used for debugging movements
 
 
@@ -133,15 +134,19 @@ Metto il contatore dimezzato rispetto a quello del timer0 per privilegiare gli i
 */
 //EMULATOR: 0x1000
 //REAL BOARD: 16 ms * 25 MHz = 0x61A80
-#define RIT_Time 0x1000
+#define RIT_Time 0x61A80 //0x1000
 
 
 //Timer to redraw GUI Texts
 //3 ms
 //EMULATOR: 0x2000
 //REAL BOARD: 0xC3500
-#define TextRedraw_Time 0x2000 //0xC3500 
+#define TextRedraw_Time 0xC3500 
 
+
+//MUSIC EFFECTS
+//DO -> 440 Hz
+#define NoteFreq 440 //DO: 440 Hz
 
 //GAME MECHANICS INTERRUPTS PRIORITIES
 /*
@@ -345,4 +350,49 @@ static uint8_t gameOverGfxMap[YMAX][XMAX] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 {0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0},
 {0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0},
 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+	
+	
+	
+//EXTRA POINT 2
+
+
+//Source = sgtarting point = bliky position (at the beginning is the defaullt blinky position)
+#define BLINKY_START_X 24		//cell
+#define BLINKY_STATRT_Y 29 	//cell
+	static uint8_t Blinky[STDPILLS_H][STDPILLS_W] = {
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Riga 1
+    {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}, // Riga 2
+    {0, 0, 1, 0, 0, 0, 0, 1, 0, 0}, // Riga 3
+    {0, 1, 0, 1, 0, 0, 1, 0, 1, 0}, // Riga 4
+    {0, 1, 0, 0, 0, 0, 0, 0, 1, 0}, // Riga 5
+    {0, 1, 0, 1, 1, 1, 1, 0, 1, 0}, // Riga 6
+    {0, 1, 0, 0, 0, 0, 0, 0, 1, 0}, // Riga 7
+    {0, 1, 1, 0, 1, 0, 1, 0, 1, 0}, // Riga 8
+    {0, 1, 0, 1, 0, 1, 0, 1, 0, 0}, // Riga 9
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0} // Riga 10
+};
+	
+extern uint8_t gX, gY; //Blinky cell coordinates 
+void drawBlinky(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t animation);
+uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction);
+int manhattanDistance(uint8_t playerX, uint8_t playerY, uint8_t newGhostX, uint8_t newGhostY);
+
+static uint16_t SinTable[45] =                                       /* ÕýÏÒ±í                       */
+{
+    410, 467, 523, 576, 627, 673, 714, 749, 778,
+    799, 813, 819, 817, 807, 789, 764, 732, 694, 
+    650, 602, 550, 495, 438, 381, 324, 270, 217,
+    169, 125, 87 , 55 , 30 , 12 , 2  , 0  , 6  ,   
+    20 , 41 , 70 , 105, 146, 193, 243, 297, 353
+};
+
+
+
+typedef struct Node {
+    uint8_t x, y;           // Posizione
+    int g, h, f;        // Costi: g (distanza da start), h (euristica), f = g + h
+    struct Node* parent; // Nodo genitore per ricostruire il percorso
+} Node;
+
+
 #endif
