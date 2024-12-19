@@ -28,6 +28,7 @@
 #include "../../game.h"  		//GAME LIBRARY
 #include "../../RIT.h"   		//RIT 
 #include "../../button.h" 	//BUTTON
+#include "../../CAN.h"			//CAN
 
 #ifdef SIMULATOR
 extern uint8_t ScaleFlag; // <- ScaleFlag needs to visible in order for the emulator to find the symbol (can be placed also inside system_LPC17xx.h but since it is RO, it needs more work)
@@ -121,8 +122,8 @@ uint8_t playerDir;
 uint16_t plX = XMAX / 2 - 1;
 uint16_t plY = YMAX / 2;
 uint16_t score = 0;
-uint16_t life = 1;
-uint16_t gameTime = GAMETIME_LIMIT;
+uint8_t life = 1;
+uint8_t gameTime = GAMETIME_LIMIT;
 
 uint8_t pwrPills[PWR_PILLS][2] = {{-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}};
 uint8_t pwrPillsCounter = 0;
@@ -135,7 +136,7 @@ uint16_t remainingPills = STD_PILLS; //count remaining pills to victory!
 
 const int timMusicInterval = NoteFreq / 1000 * 25000000;
 uint8_t reproduceNotes = 0;
-uint8_t reproductionTime = 200;
+uint8_t reproductionTime = pillSoundReproductionCycles;
 //EXTRA POINT 2
 //A Star Algorithm
 /*
@@ -156,6 +157,10 @@ uint8_t src[2] = {BLINKY_START_X, BLINKY_STATRT_Y}; //SRC = BLINKY POS
 uint8_t dest[2] = {XMAX / 2 - 1, YMAX / 2};	//DEST: PLAYER POS
 */
 
+
+//CAN MSG
+extern CAN_msg CAN_TxMsg; //TX CAN struct (sent by CAN1 to CAN2)
+extern CAN_msg CAN_RxMgs; //RX CAN struct (received by CAN2 from CAN1)
 int main(void)
 {
   SystemInit();  												/* System Initialization (i.e., PLL)  */
@@ -166,9 +171,14 @@ int main(void)
 	LPC_GPIO0->FIODIR |= (1<<26);
 	
 	//REPRODUCE MUSIC
-	init_timer(2, 300);
+	//Not on simulator
+	/*
+	init_timer(2, PillSoundTime);
 	enable_timer(2);
+	*/
 	
+	//INIT CAN
+	CAN_Init();
 	
   LCD_Initialization();
 	

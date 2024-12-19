@@ -637,6 +637,7 @@ void deleteRemainingPills(){
 	}
 	
 }
+
 extern uint8_t EINT0_down;
 void newGameRoutine() {
 	LCD_Clear(BACKGROUND_COLOR);
@@ -800,12 +801,12 @@ void resumeGameRoutine() {
 	
 	//START GAME TIMERS
 	
-	/*
+	
 	disable_RIT();
 	reset_RIT();
 	init_RIT(RIT_Time);
 	enable_RIT();
-	*/
+	
 	
 	//START TIMER0 TO UPDATE GAME
 	/*
@@ -1020,6 +1021,29 @@ void drawBlinky(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t anima
 				++cntX;
 			}
 	} 
+
+extern CAN_msg CAN_TxMsg;
+uint8_t CAN_Send() {
+	// send from CAN1 to CAN2
+	/*
+	CAN PAYLOAD:
+	gameTime -> 8 bits
+	life -> 8 bits
+	score -> 16 bits (8+8)
+	*/
+	
+	CAN_TxMsg.data[0] = gameTime; 
+	CAN_TxMsg.data[1] = life;
+	CAN_TxMsg.data[2] = (score >> 8) & 0xFF;			//send first 8 MSB of score
+	CAN_TxMsg.data[3] = score & 0xFF; 						//send last 8 bits of score
+	CAN_TxMsg.len = 4;
+	CAN_TxMsg.id = 2;
+	CAN_TxMsg.format = STANDARD_FORMAT;
+	CAN_TxMsg.type = DATA_FRAME;
+	CAN_wrMsg (1, &CAN_TxMsg);               /* transmit message */
+	
+	return 1;
+}
 
 void create_valid_nodes(Node nodes[], int* node_count) {
 		//put all the free cells or the cells hosting the stdpill/pwr pill as nodes in the graph

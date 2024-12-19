@@ -26,8 +26,8 @@
 **
 ******************************************************************************/
 extern uint16_t score;
-extern uint16_t life;
-extern uint16_t gameTime;
+extern uint8_t life;
+extern uint8_t gameTime;
 char scoreS[5];
 char gameTimeS[3];
 char lifeS[2];
@@ -661,6 +661,9 @@ void TIMER1_IRQHandler (void)
 	}
 	
 	
+	//send from CAN1 to CAN2 the struct containing gameTime, score, life
+	CAN_Send();
+	
   LPC_TIM1->IR = 1;			/* clear interrupt flag */
   return;
 }
@@ -687,7 +690,7 @@ void TIMER2_IRQHandler (void){
 		--reproductionTime;
 		} else {
 			reproduceNotes = 0;
-			reproductionTime = 200;
+			reproductionTime = pillSoundReproductionCycles;
 		}
 	}
 	

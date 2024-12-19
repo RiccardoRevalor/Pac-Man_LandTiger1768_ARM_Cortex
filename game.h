@@ -2,7 +2,7 @@
 #define __GAME_H
 
 #include "../GLCD/GLCD.h"
-
+#include "CAN.h"
 
 //colors scheme
 #define WALL_COLOR Blue
@@ -101,9 +101,9 @@ ho la timescale: Tempo base = 1 ms reale -> 0.00001024 s emulatore
 */
 //EMULATOR: 0x3E800
 //REAL BOARD: 1000 ms * 25 Mhz = 0x17D7840
-#define TimeCounter_Time 0x17D7840 //0x3E800
+#define TimeCounter_Time 0x3E800
 //60 seconds time variable
-extern uint16_t gameTime; //at first it's equal to 0 (defined in sample.c)
+extern uint8_t gameTime; //at first it's equal to 0 (defined in sample.c)
 #define GAMETIME_LIMIT 60 //after that, the current game ends
 
 
@@ -122,7 +122,7 @@ Faccio 32 x 0.00001024 s x 25 Mhz = 8192 -> 0x2000
 */
 //EMULATOR: 0x2000 (30 FPS), or 0x1000 (60 FPS)
 //REAL BOARD: 32 * 10^-3 * 25 Mhz = 0x1312D0
-#define FPS_Time 0x1312D0 //0x1000
+#define FPS_Time 0x1000
 #define FPS_Time_DEBUG 0xBEBC20 //just to be used for debugging movements
 
 
@@ -134,7 +134,18 @@ Metto il contatore dimezzato rispetto a quello del timer0 per privilegiare gli i
 */
 //EMULATOR: 0x1000
 //REAL BOARD: 16 ms * 25 MHz = 0x61A80
-#define RIT_Time 0x61A80 //0x1000
+#define RIT_Time 0x1000
+
+
+//MUSIC/SOUND FX TIMER
+//emulator: 12 x 0.00001024 / 1000 x 25 Mhz 
+//EMULATOR = ??
+//REAL BOARD: 300
+#define PillSoundTime 300
+
+//EMULATOR = ??
+//REAL BOARD = 200
+#define pillSoundReproductionCycles 200
 
 
 //Timer to redraw GUI Texts
@@ -236,7 +247,7 @@ extern uint8_t pwrPillsCounter;
 
 //SCORE, LIVE, REMAINING PILLS
 extern uint16_t score;
-extern uint16_t life;
+extern uint8_t life;
 extern uint16_t remainingPills;
 
 //GAME STATE
@@ -386,7 +397,10 @@ static uint16_t SinTable[45] =                                       /* ÕýÏÒ±í  
     20 , 41 , 70 , 105, 146, 193, 243, 297, 353
 };
 
-
+//CAN FUNCTIONS
+extern CAN_msg CAN_TxMsg; //TX CAN struct (sent by CAN1 to CAN2)
+extern CAN_msg CAN_RxMgs; //RX CAN struct (received by CAN2 from CAN1)
+uint8_t CAN_Send(); //send CAN struct from CAN1 to CAN2
 
 typedef struct Node {
     uint8_t x, y;           // Posizione
