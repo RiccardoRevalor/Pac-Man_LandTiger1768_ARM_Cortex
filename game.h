@@ -101,7 +101,7 @@ ho la timescale: Tempo base = 1 ms reale -> 0.00001024 s emulatore
 */
 //EMULATOR: 0x3E800
 //REAL BOARD: 1000 ms * 25 Mhz = 0x17D7840
-#define TimeCounter_Time 0x3E800
+#define TimeCounter_Time 0x17D7840 //0x3E800
 //60 seconds time variable
 extern uint8_t gameTime; //at first it's equal to 0 (defined in sample.c)
 #define GAMETIME_LIMIT 60 //after that, the current game ends
@@ -121,8 +121,8 @@ Tempo base = 1 ms reale -> 0.00001024 s emulatore
 Faccio 32 x 0.00001024 s x 25 Mhz = 8192 -> 0x2000
 */
 //EMULATOR: 0x2000 (30 FPS), or 0x1000 (60 FPS)
-//REAL BOARD: 32 * 10^-3 * 25 Mhz = 0x1312D0
-#define FPS_Time 0x1000
+//REAL BOARD: 32 * 10^-3 * 25 Mhz = 0x1312D0 					0x30D400 for less speed
+#define FPS_Time 0x1312D0 //0x1000
 #define FPS_Time_DEBUG 0x10000 //just to be used for debugging movements
 
 
@@ -134,14 +134,14 @@ Metto il contatore dimezzato rispetto a quello del timer0 per privilegiare gli i
 */
 //EMULATOR: 0x1000
 //REAL BOARD: 16 ms * 25 MHz = 0x61A80
-#define RIT_Time 0x1000
+#define RIT_Time 0x61A80 //0x1000
 
 
 //MUSIC/SOUND FX TIMER
 //emulator: 12 x 0.00001024 / 1000 x 25 Mhz 
 //EMULATOR = ??
 //REAL BOARD: 300
-#define PillSoundTime 300
+#define PillSoundTime 0x7270E0 //300
 
 //EMULATOR = ??
 //REAL BOARD = 200
@@ -385,6 +385,7 @@ static uint8_t gameOverGfxMap[YMAX][XMAX] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	
 extern uint8_t gX, gY; //Blinky cell coordinates 
 void drawBlinky(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t animation);
+void eraseBlinky(uint16_t cellX, uint16_t cellY);
 uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction);
 int manhattanDistance(uint8_t playerX, uint8_t playerY, uint8_t newGhostX, uint8_t newGhostY);
 uint8_t prevValueIsCompletePill(uint8_t prevV[4], uint8_t pwrPill);

@@ -533,6 +533,23 @@ void erasePlayer(uint16_t cellX, uint16_t cellY){
 	}
 }
 
+void eraseBlinky(uint16_t cellX, uint16_t cellY){
+	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
+	uint16_t x, y;
+	uint16_t cntX = 0, cntY = 0;
+	
+	
+	for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
+				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
+					LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+					
+					cntY++;
+				}
+				cntY = 0;
+				++cntX;
+	}
+}
+
 extern uint8_t reproduceNotes;
 void erasePill(uint16_t cellX, uint16_t cellY){
 	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
@@ -1050,19 +1067,22 @@ void drawBlinky(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t anima
 	uint16_t xplayer = getPixelX(cellX), yplayer = getPixelY(cellY);
 	uint16_t x, y;
 	uint16_t cntX = 0, cntY = 0;
-	uint16_t res = (cellY + cellX) % 2;
 	
+	//animation 0 -> not frightened
+	//animation 1 -> frightened
 	
+	/*
 	maze[cellY][cellX] = PLAYER_CODE;
 	maze[cellY+1][cellX] = PLAYER_CODE;
 	maze[cellY][cellX+1] = PLAYER_CODE;
 	maze[cellY+1][cellX+1] = PLAYER_CODE;
+	*/
 	
 	
 
 			for (x = xplayer; x < xplayer + PLAYER_CELLS_W * CELL_W; x++) {
 				for (y = yplayer; y < yplayer + PLAYER_CELLS_H * CELL_H; y++) {
-					if (res == 0 || animation == 0) {
+					if (animation == 0) {
 						if (Blinky[cntY][cntX] == 1) {
 							if (LCD_GetPoint(x, y ) != BLINKY_COLOR) LCD_SetPoint(x, y, BLINKY_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
 						} else {
@@ -1070,9 +1090,9 @@ void drawBlinky(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t anima
 						}
 					} else {
 						if (Blinky[cntY][cntX] == 1) {
-							if (LCD_GetPoint(x, y ) != BLINKY_COLOR) LCD_SetPoint(x, y, BLINKY_COLOR);	//set the player colore in the ones of the matrix to draw the player's shape
+							if (LCD_GetPoint(x, y ) != White) LCD_SetPoint(x, y, White);	//set the player colore in the ones of the matrix to draw the player's shape
 						} else {
-							if (LCD_GetPoint(x, y ) != BACKGROUND_COLOR) LCD_SetPoint(x, y, BACKGROUND_COLOR); //set the background color in the zeros of the player matrix to create space from other props
+							if (LCD_GetPoint(x, y ) != Blue) LCD_SetPoint(x, y, Blue); //set the background color in the zeros of the player matrix to create space from other props
 						}
 					}
 					cntY++;

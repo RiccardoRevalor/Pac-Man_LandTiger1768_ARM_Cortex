@@ -238,10 +238,12 @@ int main(void)
 	
 	//REPRODUCE MUSIC
 	//Not on simulator
+	
 	/*
 	init_timer(2, PillSoundTime);
 	enable_timer(2);
 	*/
+	
 	
 	//INIT CAN
 	CAN_Init();
