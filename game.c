@@ -679,6 +679,9 @@ void newGameRoutine() {
 	//PILLS MANAGEMENT
 	placePills4();
 	
+	
+	//draw door
+	drawDoor(24, 28, 1, 1);
 	//drawBlanks();
 	
 	//draw blinky
@@ -874,7 +877,64 @@ int manhattanDistance(uint8_t playerX, uint8_t playerY, uint8_t newGhostX, uint8
 	
 }
 
-uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction){
+uint8_t checkCollision(uint8_t blinkyX, uint8_t blinkyY, uint8_t playerX, uint8_t playerY) {
+    // Controllo dell'intersezione tra le aree di Blinky (2x2) e del giocatore (2x2)
+    if ((blinkyX < playerX + 2) && (blinkyX + 2 > playerX) &&
+        (blinkyY < playerY + 2) && (blinkyY + 2 > playerY)) {
+        return 1; // Collisione rilevata
+    }
+    return 0; // Nessuna collisione
+}
+
+
+uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction) {
+    // Controlla che Blinky non esca dai limiti della mappa
+    if (x < 0 || x >= XMAX - 1 || y < MAZESTART || y >= YMAX - 2) {
+        return 0; // Fuori dai limiti
+    }
+
+    // Controlla la direzione del movimento
+    if (direction == RIGHT_DIR) {
+        // Spostamento a destra (controlla le celle a destra del quadrato)
+        if ((maze[y][x + 2] == PLAYER_CODE || maze[y][x + 2] == FREE_CODE || maze[y][x + 2] == STDPILL_CODE_1 || maze[y][x + 2] == STDPILL_CODE_2 || 
+             maze[y][x + 2] == PWRPILL_CODE_1 || maze[y][x + 2] == PWRPILL_CODE_2) &&
+            (maze[y + 1][x + 2] == PLAYER_CODE || maze[y + 1][x + 2] == FREE_CODE || maze[y + 1][x + 2] == STDPILL_CODE_1 || maze[y + 1][x + 2] == STDPILL_CODE_2 || 
+             maze[y + 1][x + 2] == PWRPILL_CODE_1 || maze[y + 1][x + 2] == PWRPILL_CODE_2)) {
+            return 1; // Direzione valida
+        }
+    } else if (direction == LEFT_DIR) {
+        // Spostamento a sinistra (controlla le celle a sinistra del quadrato)
+        if ((maze[y][x - 1] == PLAYER_CODE || maze[y][x - 1] == FREE_CODE || maze[y][x - 1] == STDPILL_CODE_1 || maze[y][x - 1] == STDPILL_CODE_2 || 
+             maze[y][x - 1] == PWRPILL_CODE_1 || maze[y][x - 1] == PWRPILL_CODE_2) &&
+            (maze[y + 1][x - 1] == PLAYER_CODE || maze[y + 1][x - 1] == FREE_CODE || maze[y + 1][x - 1] == STDPILL_CODE_1 || maze[y + 1][x - 1] == STDPILL_CODE_2 || 
+             maze[y + 1][x - 1] == PWRPILL_CODE_1 || maze[y + 1][x - 1] == PWRPILL_CODE_2)) {
+            return 1; // Direzione valida
+        }
+    } else if (direction == UP_DIR) {
+        // Spostamento verso l'alto (controlla le celle sopra il quadrato)
+        if ((maze[y - 1][x] == PLAYER_CODE || maze[y - 1][x] == FREE_CODE || maze[y - 1][x] == STDPILL_CODE_1 || maze[y - 1][x] == STDPILL_CODE_2 || 
+             maze[y - 1][x] == PWRPILL_CODE_1 || maze[y - 1][x] == PWRPILL_CODE_2) &&
+            (maze[y - 1][x + 1] == PLAYER_CODE || maze[y - 1][x + 1] == FREE_CODE || maze[y - 1][x + 1] == STDPILL_CODE_1 || maze[y - 1][x + 1] == STDPILL_CODE_2 || 
+             maze[y - 1][x + 1] == PWRPILL_CODE_1 || maze[y - 1][x + 1] == PWRPILL_CODE_2)) {
+            return 1; // Direzione valida
+        }
+    } else if (direction == DOWN_DIR) {
+        // Spostamento verso il basso (controlla le celle sotto il quadrato)
+        if ((maze[y + 2][x] == PLAYER_CODE || maze[y + 2][x] == FREE_CODE || maze[y + 2][x] == STDPILL_CODE_1 || maze[y + 2][x] == STDPILL_CODE_2 || 
+             maze[y + 2][x] == PWRPILL_CODE_1 || maze[y + 2][x] == PWRPILL_CODE_2) &&
+            (maze[y + 2][x + 1] == PLAYER_CODE || maze[y + 2][x + 1] == FREE_CODE || maze[y + 2][x + 1] == STDPILL_CODE_1 || maze[y + 2][x + 1] == STDPILL_CODE_2 || 
+             maze[y + 2][x + 1] == PWRPILL_CODE_1 || maze[y + 2][x + 1] == PWRPILL_CODE_2)) {
+            return 1; // Direzione valida
+        }
+    }
+
+    return 0; // Direzione non valida
+}
+
+
+
+
+uint8_t goodCellForBlinky2(uint8_t x, uint8_t y, uint8_t direction){
 	//1 -> good cell
 	//0 -> bas cell, cannot choose this direction for Blinky!
 	
@@ -884,23 +944,23 @@ uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction){
 	if (y <= MAZESTART || y >= YMAX - MAZESTART - 1) return 0;
 	
 	if (direction == RIGHT_DIR) {
-				int lookAheadX = plX + 2; 
-        int nextX = plX + 1; 
-        if (maze[plY][lookAheadX] == FREE_CODE && maze[plY+1][lookAheadX] == FREE_CODE) {
+				int lookAheadX = x + 2; 
+        int nextX = y + 1; 
+        if (maze[y][lookAheadX] == FREE_CODE && maze[y+1][lookAheadX] == FREE_CODE) {
             // Il giocatore può muoversiS
             return 1;
-        } else if ((maze[plY][lookAheadX] == STDPILL_CODE_1 || maze[plY][lookAheadX] == STDPILL_CODE_2) && (maze[plY+1][lookAheadX] == STDPILL_CODE_1 || maze[plY+1][lookAheadX] == STDPILL_CODE_2)) {
+        } else if ((maze[y][lookAheadX] == STDPILL_CODE_1 || maze[y][lookAheadX] == STDPILL_CODE_2) && (maze[y+1][lookAheadX] == STDPILL_CODE_1 || maze[y+1][lookAheadX] == STDPILL_CODE_2)) {
             return 1;
 			
 						
-        } else if (((maze[plY][lookAheadX] == STDPILL_CODE_1 || maze[plY][lookAheadX] == STDPILL_CODE_2) && maze[plY+1][lookAheadX] == FREE_CODE) || ((maze[plY+1][lookAheadX] == STDPILL_CODE_1 || maze[plY+1][lookAheadX] == STDPILL_CODE_2) && maze[plY][lookAheadX] == FREE_CODE)) {
+        } else if (((maze[y][lookAheadX] == STDPILL_CODE_1 || maze[y][lookAheadX] == STDPILL_CODE_2) && maze[y+1][lookAheadX] == FREE_CODE) || ((maze[y+1][lookAheadX] == STDPILL_CODE_1 || maze[y+1][lookAheadX] == STDPILL_CODE_2) && maze[y][lookAheadX] == FREE_CODE)) {
 					return 1;
 				
-				} else if ((maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) && (maze[plY+1][lookAheadX] == PWRPILL_CODE_1 || maze[plY+1][lookAheadX] == PWRPILL_CODE_2)) {
+				} else if ((maze[y][lookAheadX] == PWRPILL_CODE_1 || maze[y][lookAheadX] == PWRPILL_CODE_2) && (maze[y+1][lookAheadX] == PWRPILL_CODE_1 || maze[y+1][lookAheadX] == PWRPILL_CODE_2)) {
             return 1;
 			
 						
-        } else if (((maze[plY][lookAheadX] == PWRPILL_CODE_1 || maze[plY][lookAheadX] == PWRPILL_CODE_2) && maze[plY+1][lookAheadX] == FREE_CODE) || ((maze[plY+1][lookAheadX] == PWRPILL_CODE_1 || maze[plY+1][lookAheadX] == PWRPILL_CODE_2) && maze[plY][lookAheadX] == FREE_CODE)) {
+        } else if (((maze[y][lookAheadX] == PWRPILL_CODE_1 || maze[y][lookAheadX] == PWRPILL_CODE_2) && maze[y+1][lookAheadX] == FREE_CODE) || ((maze[y+1][lookAheadX] == PWRPILL_CODE_1 || maze[y+1][lookAheadX] == PWRPILL_CODE_2) && maze[y][lookAheadX] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
 					
 					return 1;
@@ -910,22 +970,22 @@ uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction){
   }
 	
 	if (direction == LEFT_DIR) {
-		int nextX = plX - 1;
-		if (maze[plY][nextX] == FREE_CODE && maze[plY+1][nextX] == FREE_CODE) {
+		int nextX = x - 1;
+		if (maze[y][nextX] == FREE_CODE && maze[y+1][nextX] == FREE_CODE) {
 						//PURE CHUNK OF 2x2 FREE BLOCKS
             return 1;	
-        } else if ((maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) && (maze[plY+1][nextX] == STDPILL_CODE_1 || maze[plY+1][nextX] == STDPILL_CODE_2)) {
+        } else if ((maze[y][nextX] == STDPILL_CODE_1 || maze[y][nextX] == STDPILL_CODE_2) && (maze[y+1][nextX] == STDPILL_CODE_1 || maze[y+1][nextX] == STDPILL_CODE_2)) {
 						//PURE CHUNK OF 2x2 STDPILL BLOCKS
             return 1;
-        } else if (((maze[plY][nextX] == STDPILL_CODE_1 || maze[plY][nextX] == STDPILL_CODE_2) && maze[plY+1][nextX] == FREE_CODE) || ((maze[plY+1][nextX] == STDPILL_CODE_1 || maze[plY+1][nextX] == STDPILL_CODE_2) && maze[plY][nextX] == FREE_CODE)) {
+        } else if (((maze[y][nextX] == STDPILL_CODE_1 || maze[y][nextX] == STDPILL_CODE_2) && maze[y+1][nextX] == FREE_CODE) || ((maze[y+1][nextX] == STDPILL_CODE_1 || maze[y+1][nextX] == STDPILL_CODE_2) && maze[y][nextX] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
 				
 					return 1;
 				
-				} else if ((maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) && (maze[plY+1][nextX] == PWRPILL_CODE_1 || maze[plY+1][nextX] == PWRPILL_CODE_2)) {
+				} else if ((maze[y][nextX] == PWRPILL_CODE_1 || maze[y][nextX] == PWRPILL_CODE_2) && (maze[y+1][nextX] == PWRPILL_CODE_1 || maze[y+1][nextX] == PWRPILL_CODE_2)) {
 						//PURE CHUNK OF 2x2 PWRPILL BLOCKS
             return 1;
-        } else if (((maze[plY][nextX] == PWRPILL_CODE_1 || maze[plY][nextX] == PWRPILL_CODE_2) && maze[plY+1][nextX] == FREE_CODE) || ((maze[plY+1][nextX] == PWRPILL_CODE_1 || maze[plY+1][nextX] == PWRPILL_CODE_2) && maze[plY][nextX] == FREE_CODE)) {
+        } else if (((maze[y][nextX] == PWRPILL_CODE_1 || maze[y][nextX] == PWRPILL_CODE_2) && maze[y+1][nextX] == FREE_CODE) || ((maze[y+1][nextX] == PWRPILL_CODE_1 || maze[y+1][nextX] == PWRPILL_CODE_2) && maze[y][nextX] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK				
 					return 1;				
 				}
@@ -933,21 +993,21 @@ uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction){
 	}
 	
 	if (direction == UP_DIR) {
-		int nextY = plY - 1; // Spostamento in alto
-        if (maze[nextY][plX] == FREE_CODE && maze[nextY][plX+1] == FREE_CODE) {
+		int nextY = y - 1; // Spostamento in alto
+        if (maze[nextY][x] == FREE_CODE && maze[nextY][x+1] == FREE_CODE) {
             return 1;
-        } else if ((maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) && (maze[nextY][plX+1] == STDPILL_CODE_1 || maze[nextY][plX+1] == STDPILL_CODE_2)) {
+        } else if ((maze[nextY][x] == STDPILL_CODE_1 || maze[nextY][x] == STDPILL_CODE_2) && (maze[nextY][x+1] == STDPILL_CODE_1 || maze[nextY][x+1] == STDPILL_CODE_2)) {
             
 						return 1;
-        } else if (((maze[nextY][plX] == STDPILL_CODE_1 || maze[nextY][plX] == STDPILL_CODE_2) && maze[nextY][plX+1] == FREE_CODE) || ((maze[nextY][plX+1] == STDPILL_CODE_1 || maze[nextY][plX+1] == STDPILL_CODE_2) && maze[nextY][plX] == FREE_CODE)) {
+        } else if (((maze[nextY][x] == STDPILL_CODE_1 || maze[nextY][x] == STDPILL_CODE_2) && maze[nextY][x+1] == FREE_CODE) || ((maze[nextY][x+1] == STDPILL_CODE_1 || maze[nextY][x+1] == STDPILL_CODE_2) && maze[nextY][x] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
 						
 				
 						return 1;
 				
-				} else if ((maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2) && (maze[nextY][plX+1] == PWRPILL_CODE_1 || maze[nextY][plX+1] == PWRPILL_CODE_2)) {
+				} else if ((maze[nextY][x] == PWRPILL_CODE_1 || maze[nextY][x] == PWRPILL_CODE_2) && (maze[nextY][x+1] == PWRPILL_CODE_1 || maze[nextY][x+1] == PWRPILL_CODE_2)) {
             return 1;
-        } else if (((maze[nextY][plX] == PWRPILL_CODE_1 || maze[nextY][plX] == PWRPILL_CODE_2) && maze[nextY][plX+1] == FREE_CODE) || ((maze[nextY][plX+1] == PWRPILL_CODE_1 || maze[nextY][plX+1] == PWRPILL_CODE_2) && maze[nextY][plX] == FREE_CODE)) {
+        } else if (((maze[nextY][x] == PWRPILL_CODE_1 || maze[nextY][x] == PWRPILL_CODE_2) && maze[nextY][x+1] == FREE_CODE) || ((maze[nextY][x+1] == PWRPILL_CODE_1 || maze[nextY][x+1] == PWRPILL_CODE_2) && maze[nextY][x] == FREE_CODE)) {
 					//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
 						
 				
@@ -958,23 +1018,23 @@ uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction){
 	
 	if (direction == DOWN_DIR){
 		
-		int lookAheadY = plY + 2;
-        int nextY = plY + 1; // Spostamento in basso
-        if (maze[lookAheadY][plX] == FREE_CODE && maze[lookAheadY][plX+1] == FREE_CODE) {
+		int lookAheadY = y + 2;
+        int nextY = y + 1; // Spostamento in basso
+        if (maze[lookAheadY][x] == FREE_CODE && maze[lookAheadY][x+1] == FREE_CODE) {
             return 1;
-        } else if ((maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) && (maze[lookAheadY][plX+1] == STDPILL_CODE_1 || maze[lookAheadY][plX+1] == STDPILL_CODE_2)) {
+        } else if ((maze[lookAheadY][x] == STDPILL_CODE_1 || maze[lookAheadY][x] == STDPILL_CODE_2) && (maze[lookAheadY][x+1] == STDPILL_CODE_1 || maze[lookAheadY][x+1] == STDPILL_CODE_2)) {
             
 						return 1;
-        } else if (((maze[lookAheadY][plX] == STDPILL_CODE_1 || maze[lookAheadY][plX] == STDPILL_CODE_2) && maze[lookAheadY][plX+1] == FREE_CODE) || ((maze[lookAheadY][plX+1] == STDPILL_CODE_1 || maze[lookAheadY][plX+1] == STDPILL_CODE_2) && maze[lookAheadY][plX] == FREE_CODE)) {
+        } else if (((maze[lookAheadY][x] == STDPILL_CODE_1 || maze[lookAheadY][x] == STDPILL_CODE_2) && maze[lookAheadY][x+1] == FREE_CODE) || ((maze[lookAheadY][x+1] == STDPILL_CODE_1 || maze[lookAheadY][x+1] == STDPILL_CODE_2) && maze[lookAheadY][x] == FREE_CODE)) {
 						//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND STDPILL BLOCK
 						
 						return 1;
 				
-				} else if ((maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) && (maze[lookAheadY][plX+1] == PWRPILL_CODE_1 || maze[lookAheadY][plX+1] == PWRPILL_CODE_2)) {
+				} else if ((maze[lookAheadY][x] == PWRPILL_CODE_1 || maze[lookAheadY][x] == PWRPILL_CODE_2) && (maze[lookAheadY][x+1] == PWRPILL_CODE_1 || maze[lookAheadY][x+1] == PWRPILL_CODE_2)) {
             //FULL PWR PILL
 						//Score update
 						return 1;
-        } else if (((maze[lookAheadY][plX] == PWRPILL_CODE_1 || maze[lookAheadY][plX] == PWRPILL_CODE_2) && maze[lookAheadY][plX+1] == FREE_CODE) || ((maze[lookAheadY][plX+1] == PWRPILL_CODE_1 || maze[lookAheadY][plX+1] == PWRPILL_CODE_2) && maze[lookAheadY][plX] == FREE_CODE)) {
+        } else if (((maze[lookAheadY][x] == PWRPILL_CODE_1 || maze[lookAheadY][x] == PWRPILL_CODE_2) && maze[lookAheadY][x+1] == FREE_CODE) || ((maze[lookAheadY][x+1] == PWRPILL_CODE_1 || maze[lookAheadY][x+1] == PWRPILL_CODE_2) && maze[lookAheadY][x] == FREE_CODE)) {
 						//HYBRID CHUNK SPLITTED BETWEEN E FREE BLOCK AND PWRPILL BLOCK
 						
 						return 1;
@@ -1045,6 +1105,14 @@ uint8_t CAN_Send() {
 	return 1;
 }
 
+uint8_t prevValueIsCompletePill(uint8_t prevV[4], uint8_t pwrPill) {
+	if (pwrPill == 0 && prevV[0] == STDPILL_CODE_1 && prevV[1] == STDPILL_CODE_2 && prevV[2] == STDPILL_CODE_2 && prevV[3] == STDPILL_CODE_2) return 1;
+	if (pwrPill == 0 && prevV[0] == PWRPILL_CODE_1 && prevV[1] == PWRPILL_CODE_2 && prevV[2] == PWRPILL_CODE_2 && prevV[3] == PWRPILL_CODE_2) return 1;
+
+	
+	return 0;
+	
+}
 void create_valid_nodes(Node nodes[], int* node_count) {
 		//put all the free cells or the cells hosting the stdpill/pwr pill as nodes in the graph
     *node_count = 0;

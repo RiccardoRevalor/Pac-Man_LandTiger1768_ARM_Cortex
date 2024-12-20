@@ -123,7 +123,7 @@ Faccio 32 x 0.00001024 s x 25 Mhz = 8192 -> 0x2000
 //EMULATOR: 0x2000 (30 FPS), or 0x1000 (60 FPS)
 //REAL BOARD: 32 * 10^-3 * 25 Mhz = 0x1312D0
 #define FPS_Time 0x1000
-#define FPS_Time_DEBUG 0xBEBC20 //just to be used for debugging movements
+#define FPS_Time_DEBUG 0x10000 //just to be used for debugging movements
 
 
 //1 ms
@@ -368,8 +368,8 @@ static uint8_t gameOverGfxMap[YMAX][XMAX] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 
 
 //Source = sgtarting point = bliky position (at the beginning is the defaullt blinky position)
-#define BLINKY_START_X 24		//cell
-#define BLINKY_STATRT_Y 29 	//cell
+#define BLINKY_START_X  24 //2  //24		//cell
+#define BLINKY_STATRT_Y 29 //MAZESTART + 2 //29 	//cell
 	static uint8_t Blinky[STDPILLS_H][STDPILLS_W] = {
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // Riga 1
     {0, 0, 0, 1, 1, 1, 1, 0, 0, 0}, // Riga 2
@@ -387,6 +387,10 @@ extern uint8_t gX, gY; //Blinky cell coordinates
 void drawBlinky(uint16_t cellX, uint16_t cellY, uint8_t direction, uint8_t animation);
 uint8_t goodCellForBlinky(uint8_t x, uint8_t y, uint8_t direction);
 int manhattanDistance(uint8_t playerX, uint8_t playerY, uint8_t newGhostX, uint8_t newGhostY);
+uint8_t prevValueIsCompletePill(uint8_t prevV[4], uint8_t pwrPill);
+uint8_t checkCollision(uint8_t blinkyX, uint8_t blinkyY, uint8_t playerX, uint8_t playerY);
+static uint8_t BlinkyStartMoves[] = {UP_DIR, UP_DIR, UP_DIR,RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, UP_DIR, UP_DIR, UP_DIR}; //RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR, RIGHT_DIR};
+#define BLINKYSTATRTMOVES_COUNT 13 //20
 
 static uint16_t SinTable[45] =                                       /* ÕýÏÒ±í                       */
 {

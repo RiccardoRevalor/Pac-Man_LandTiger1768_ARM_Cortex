@@ -59,6 +59,13 @@ void updateLifeString(){
 
 
 
+//PREVIOUS VALUE OF BLINKY CELL
+uint8_t prevValue[4] = {0, 0, 0, 0}; //left up, left down, right up, right down)
+//BLINKY START MOVES TO EXIT FROM THE HOUSE
+uint8_t startMovesCnt = 0; //counter
+uint8_t doStartMoves = 1; //1 -> do start moves routine, 0 -> routines finished, move normally
+static uint8_t lastDir = UP_DIR; //last ghost dir
+
 void TIMER0_IRQHandler (void)
 {
 	//NVIC_DisableIRQ(TIMER0_IRQn);
@@ -163,7 +170,7 @@ void TIMER0_IRQHandler (void)
 					drawPlayer(LT_X+1, plY, playerDir, 1);
 					plX = LT_X+1;
 				} else {
-					playerDir = IDLE_DIR;
+					//playerDir = IDLE_DIR;
 				}
 				//drawBlank(nextX, plY);
 				
@@ -260,7 +267,7 @@ void TIMER0_IRQHandler (void)
 					drawPlayer(RT_X-2, plY, playerDir, 1);
 					plX = RT_X-2;
 				}else {
-					playerDir = IDLE_DIR;
+					//playerDir = IDLE_DIR;
 				}
 				
 				//DEBUG MOVEMENTS
@@ -341,7 +348,7 @@ void TIMER0_IRQHandler (void)
 						plY = nextY;
 				
 				} else {
-					playerDir = IDLE_DIR;
+					//playerDir = IDLE_DIR;
 					
 				}
 				
@@ -422,7 +429,7 @@ void TIMER0_IRQHandler (void)
 						plY = nextY;
 				
 				} else {
-					playerDir = IDLE_DIR;
+					//playerDir = IDLE_DIR;
 					//LCD_Clear(Blue);
 				}
 				
@@ -465,8 +472,21 @@ void TIMER0_IRQHandler (void)
 	uint8_t bestDir = UP_DIR;
 	int lowestDistance = 10000;
 	int d = 0;
-
-	if (goodCellForBlinky(gX, gY, UP_DIR) == 1) {
+	
+	//at first: do start moves routine
+	if (doStartMoves == 1) {
+		if (startMovesCnt < BLINKYSTATRTMOVES_COUNT) {
+			bestDir = BlinkyStartMoves[startMovesCnt];
+			++startMovesCnt;
+		} else {
+			//start moves routine finished, reset counters and set flag to zero
+			doStartMoves = 0;
+			startMovesCnt = 0;
+		}
+	}
+	else {
+		//move normally, start moves finished
+	if (goodCellForBlinky(gX, gY, UP_DIR) == 1 && lastDir != DOWN_DIR) {
 		//UP IS (gX, gY-1)
 		//if yes, calculate manhattan and in case update the best dir and lowest distance
 		d = manhattanDistance(plX, plY, gX, gY-1);
@@ -475,7 +495,7 @@ void TIMER0_IRQHandler (void)
 			lowestDistance = d;
 		}
 	}
-	if (goodCellForBlinky(gX, gY, LEFT_DIR) == 1) {
+	if (goodCellForBlinky(gX, gY, LEFT_DIR) == 1 && lastDir != RIGHT_DIR) {
 		//LEFT IS (gX-1, gY)
 		//if yes, calculate manhattan and in case update the best dir and lowest distance
 		d = manhattanDistance(plX, plY, gX-1, gY);
@@ -484,7 +504,7 @@ void TIMER0_IRQHandler (void)
 			lowestDistance = d;
 		}
 	}
-	if (goodCellForBlinky(gX, gY, DOWN_DIR) == 1) {
+	if (goodCellForBlinky(gX, gY, DOWN_DIR) == 1 && lastDir != UP_DIR) {
 		//DOWN IS (gX, gY+1)
 		//if yes, calculate manhattan and in case update the best dir and lowest distance
 		d = manhattanDistance(plX, plY, gX, gY+1);
@@ -493,7 +513,7 @@ void TIMER0_IRQHandler (void)
 			lowestDistance = d;
 		}
 	}
-	if (goodCellForBlinky(gX, gY, RIGHT_DIR) == 1) {
+	if (goodCellForBlinky(gX, gY, RIGHT_DIR) == 1 && lastDir != LEFT_DIR) {
 		//RIGHT IS (gX+1, gY)
 		//if yes, calculate manhattan and in case update the best dir and lowest distance
 		d = manhattanDistance(plX, plY, gX+1, gY);
@@ -502,9 +522,124 @@ void TIMER0_IRQHandler (void)
 			lowestDistance = d;
 		}
 	}
+}
+	
+	lastDir = bestDir; //update lastDir for the next iteration
+
 	//At this Point I know the best direction for Blinky!
 	erasePlayer(gX, gY);
+	
+	//now: redraw blinky at the new cell and with the best choosen dir
+	//if blinky was sitting on a pill, you have to redraw the pill too at the previous position
+	//uint8_t prevValue[4] = {0, 0, 0, 0}; //left up, left down, right up, right down)
+	//(gX, gY) point is in the left up cell
+	if (prevValueIsCompletePill(prevValue, 0)){
+			//Blinky was sitting on a complete stdpill, redraw it
+			drawPills4(gX, gY, 0);
+	} else if (prevValueIsCompletePill(prevValue, 1)){
+			//Blinky was sitting on a complete pwrpill, redraw it
+			drawPills4(gX, gY, 1);
+	} else {
+		//HALF PILL CASES
+		
+		//CASE 1: HALF PILL ON THE UPPER CELLS OF THE 2x2 square
+		if (prevValue[0] == STDPILL_CODE_1 && prevValue[2] == STDPILL_CODE_1) {
+			//half stdpill up
+			drawPills4(gX, gY-1, 0);		
+			maze[gY+1][gX] = FREE_CODE;
+			maze[gY+1][gX+1] = FREE_CODE;
+		}
+		if (prevValue[0] == PWRPILL_CODE_1 && prevValue[2] == PWRPILL_CODE_1){
+			//half pwrpill up
+			drawPills4(gX, gY-1, 1);	
+			maze[gY+1][gX] = FREE_CODE;
+			maze[gY+1][gX+1] = FREE_CODE;
+		}
+		
+		//CASE 2: HALF PILL ON THE LOWER CELLS OF THE 2x2 square
+		if (prevValue[1] == STDPILL_CODE_1 && prevValue[3] == STDPILL_CODE_1) {
+			//half stdpill down
+			drawPills4(gX, gY+1, 0);		
+			maze[gY][gX] = FREE_CODE;
+			maze[gY][gX+1] = FREE_CODE;
+		}
+		if (prevValue[1] == PWRPILL_CODE_1 && prevValue[3] == PWRPILL_CODE_1){
+			//half pwrpill down
+			drawPills4(gX, gY+1, 1);	
+			maze[gY][gX] = FREE_CODE;
+			maze[gY][gX+1] = FREE_CODE;
+		}
+		
+		//CASE 3: HALF PILL ON THE RIGHTMOST CELLS OF THE 2x2 square
+		if (prevValue[2] == STDPILL_CODE_1 && prevValue[3] == STDPILL_CODE_1) {
+			//half stdpill right
+			drawPills4(gX+1, gY, 0);
+			maze[gY][gX] = FREE_CODE;
+			maze[gY+1][gX] = FREE_CODE;			
+		}
+		if (prevValue[2] == PWRPILL_CODE_1 && prevValue[3] == PWRPILL_CODE_1){
+			//half pwrpill right
+			drawPills4(gX+1, gY, 1);	
+			maze[gY][gX] = FREE_CODE;
+			maze[gY+1][gX] = FREE_CODE;	
+		}
+		
+		//CASE 4: HALF PILL ON THE LEFTMOST CELLS OF THE 2x2 square
+		if (prevValue[0] == STDPILL_CODE_1 && prevValue[1] == STDPILL_CODE_1) {
+			//half stdpill left
+			drawPills4(gX-1, gY, 0);	
+			maze[gY][gX+1] = FREE_CODE;
+			maze[gY+1][gX+1] = FREE_CODE;			
+		}
+		if (prevValue[0] == PWRPILL_CODE_1 && prevValue[1] == PWRPILL_CODE_1){
+			//half pwrpill left
+			drawPills4(gX-1, gY, 1);	
+			maze[gY][gX+1] = FREE_CODE;
+			maze[gY+1][gX+1] = FREE_CODE;	
+		}
+		
+		
+	}
+	
+	//choose bestdir and redraw ghost and save prev values
+	switch (bestDir) {
+        case UP_DIR:    gY--; break;
+        case LEFT_DIR:  gX--; break;
+        case DOWN_DIR:  gY++; break;
+        case RIGHT_DIR: gX++; break;
+    }
+	
+	//save prevValues 
+	//left up, left down, right up, right down
+	prevValue[0] = maze[gY][gX];				//left up
+	prevValue[1] = maze[gY+1][gX]; 			//left down
+	prevValue[2] = maze[gY][gX+1]; 			//right up
+	prevValue[2] = maze[gY+1][gX+1];		//right down
+		
+	//redraw Blinky ate the new (gX, gY)
 	drawBlinky(gX, gY, bestDir, 0);
+		
+		
+	//check collision between Blinky and player
+	if (checkCollision(gX, gY, plX, plY)){
+		isPaused = 1;
+		firstGame = 1;
+		remainingPills = STD_PILLS; //reset counter for remaining pills for the new game
+		erasePlayer(plX, plY);
+		
+		showGameOver();
+		deleteRemainingPills();
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+
 	
 	if (score >= LTHRES && (score % LTHRES == 0)) {
     if (lifeNeedsRedraw == 0) {
