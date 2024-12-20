@@ -462,8 +462,10 @@ void TIMER0_IRQHandler (void)
 				isIdle = 1;
 				
 				if (scoreNeedsRedraw==1){
+					if (USE_CAN == 0) {
 					updateScoreString();
 					scoreNeedsRedraw=0;
+					}
 				}
 				
 			}
@@ -701,7 +703,9 @@ void TIMER0_IRQHandler (void)
 				frightened = 0;
 			} else {
 				life--;
+				if (USE_CAN == 0) {
 				updateLifeString();
+				}
 			}
 		} else {
 			//delete ghost
@@ -731,7 +735,9 @@ void TIMER0_IRQHandler (void)
         life = life + 1;
 				score += 10;
         lifeNeedsRedraw = 1;
+				if (USE_CAN == 0){
         updateLifeString();
+				}
     }
 } /*else {
     // Resetta il flag quando il punteggio non è più un multiplo di 100
@@ -874,7 +880,9 @@ void TIMER1_IRQHandler (void)
 	
 	//decrement gameTime by 1 time unit
 	--gameTime;
+	if (USE_CAN == 0) {
 	updateGameTimeString();
+	}
 	
 	if (gameTime <= 0) {
 		

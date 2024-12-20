@@ -406,6 +406,7 @@ static uint16_t SinTable[45] =                                       /* ÕýÏÒ±í  
 extern CAN_msg CAN_TxMsg; //TX CAN struct (sent by CAN1 to CAN2)
 extern CAN_msg CAN_RxMgs; //RX CAN struct (received by CAN2 from CAN1)
 uint8_t CAN_Send(); //send CAN struct from CAN1 to CAN2
+#define USE_CAN 1 //1 -> USE CAN; 0 -> update normally via timers
 
 typedef struct Node {
     uint8_t x, y;           // Posizione
