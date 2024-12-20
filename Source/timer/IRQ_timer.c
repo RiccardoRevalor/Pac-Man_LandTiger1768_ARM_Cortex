@@ -922,7 +922,7 @@ void TIMER2_IRQHandler (void){
 
     // Ottieni il valore dalla tabella sinusoidale
     currentValue = SinTable[sineticks];
-		currentValue = currentValue * 0.1;
+		currentValue = currentValue * 0.3;
     LPC_DAC->DACR = currentValue << 6; // Scrivi il valore al DAC (sinistra 6 bit)
 
     // Incrementa l'indice della tabella

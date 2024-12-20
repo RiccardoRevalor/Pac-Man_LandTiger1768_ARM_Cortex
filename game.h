@@ -141,7 +141,7 @@ Metto il contatore dimezzato rispetto a quello del timer0 per privilegiare gli i
 //emulator: 12 x 0.00001024 / 1000 x 25 Mhz 
 //EMULATOR = ??
 //REAL BOARD: 300
-#define PillSoundTime 0x7270E0 //300
+#define PillSoundTime 300 //0x7270E0 //300
 
 //EMULATOR = ??
 //REAL BOARD = 200
