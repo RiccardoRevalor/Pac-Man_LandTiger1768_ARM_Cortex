@@ -1,7 +1,7 @@
 # Pac-Man for LandTiger Board
 
 ## Project Overview
-This project brings the classic **Pac-Man** game to the **LandTiger development board**, powered by an **ARM Cortex-M3** processor. The implementation closely follows the original Pac-Man mechanics while incorporating hardware-specific features, such as:
+This project brings the classic **Pac-Man** game to the **LandTiger 1768 development board**, powered by an **ARM Cortex-M3** processor. The implementation closely follows the original Pac-Man mechanics while incorporating hardware-specific features, such as:
 
 - **Joystick controls** for movement
 - **AI-driven ghost behavior**
